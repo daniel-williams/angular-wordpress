@@ -1,3 +1,4 @@
+import {Reducer, Action} from '@ngrx/store';
 import * as actions from '../actions/blog.action';
 import {BlogState} from '../interfaces';
 
@@ -15,7 +16,8 @@ const initialState: BlogState = {
     posts: [],
 };
 
-export default function(state: BlogState = initialState, {type, payload}) {
+export const blog:Reducer<BlogState> = (state: BlogState = initialState, action: Action) => {
+  const {type, payload} = action;
   switch(type) {
     case actions.FETCHING_EXCERPTS: {
       return Object.assign({}, state, {
