@@ -16,15 +16,16 @@ export class BlogComponent implements OnInit {
   articles: BlogArticle[];
   
   constructor(private _blogService: BlogService) {
-    this.articles = [];
+    _blogService.blog.subscribe(
+      res => {
+        this.articles = res.posts
+      },
+      err => console.error(err),
+      () => console.log('articles fetched')
+    );
   }
   
   ngOnInit() {
-    this._blogService.getExcepts()
-      .subscribe(
-        res => this.articles = res,
-        err => console.error(err),
-        () => console.log('excerpt done')
-      );
+    this._blogService.loadExcepts();
   }
 }
