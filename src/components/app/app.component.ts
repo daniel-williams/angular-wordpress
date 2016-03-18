@@ -8,7 +8,7 @@ import {blog} from '../../reducers';
 import {HomeComponent} from '../home/home.component';
 import {AboutComponent} from '../about/about.component';
 import {BlogComponent} from '../blog/blog.component';
-import {BlogArticleComponent} from '../blog/blogArticle.component';
+import {BlogArticleComponent} from '../blogArticle/blogArticle.component';
 
 
 

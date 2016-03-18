@@ -1,8 +1,15 @@
 import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {Observable} from 'rxjs';
+import {Store} from '@ngrx/store';
 
+import {BlogActionCreators} from '../../actions/blog.action.creators';
 import {BlogService} from '../../services/blog.service';
-import {BlogArticle} from '../../interfaces';
+import {
+  IAppState,
+  IBlogState,
+  IBlogArticle
+} from '../../interfaces';
 
 
 @Component({
@@ -10,22 +17,21 @@ import {BlogArticle} from '../../interfaces';
     template: require('./blog.component.html'),
     styles: [require('./blog.component.scss')],
     directives: [ROUTER_DIRECTIVES],
-    providers: [BlogService]
+    providers: [BlogActionCreators, BlogService]
 })
 export class BlogComponent implements OnInit {
-  articles: BlogArticle[];
+
+  isUpdating$: Observable<boolean>;
+  articles$: Observable<IBlogArticle[]>;
   
-  constructor(private _blogService: BlogService) {
-    _blogService.blog.subscribe(
-      res => {
-        this.articles = res.posts
-      },
-      err => console.error(err),
-      () => console.log('articles fetched')
-    );
+  constructor(private store: Store<IAppState>, private actions: BlogActionCreators) {
+    const store$ = this.store.select<IBlogState>(state => state.blog);
+    
+    this.isUpdating$ = store$.map(data => data.isUpdating);
+    this.articles$ = store$.map(data => data.posts);
   }
   
   ngOnInit() {
-    this._blogService.loadExcepts();
+    this.actions.loadExcerpts();
   }
 }
