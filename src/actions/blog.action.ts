@@ -1,6 +1,6 @@
+export const FETCH_EXCERPTS: string = 'FETCH_EXCERPTS';
 export const FETCHING_EXCERPTS: string = 'FETCHING_EXCERPTS';
-export const FETCH_EXCERPTS_SUCCESS: string = 'FETCH_EXCERPTS_SUCCESS';
-export const FETCH_EXCERPTS_FAILED: string = 'FETCH_EXCERPTS_FAILED';
+export const FETCHED_EXCERPTS: string = 'FETCHED_EXCERPTS';
 
 export const FETCHING_POST: string = 'FETCHING_POST';
 export const FETCH_POST_SUCCESS: string = 'FETCH_POST_SUCCESS';
