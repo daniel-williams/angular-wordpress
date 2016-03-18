@@ -1,9 +1,9 @@
-import {AppState} from './AppState';
-import {BlogArticle} from './BlogArticle';
-import {BlogState} from './BlogState';
+import {IAppState} from './IAppState';
+import {IBlogArticle} from './IBlogArticle';
+import {IBlogState} from './IBlogState';
 
 export {
-  AppState,
-  BlogArticle,
-  BlogState,
+  IAppState,
+  IBlogArticle,
+  IBlogState,
 }
