@@ -3,7 +3,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
 import {BlogService} from '../services/blog.service';
-import {IAppState, IBlogState} from '../interfaces';
+import {IAppStore, IBlogBody, IBlogStore} from '../interfaces';
 import * as actions from './blog.action';
 
 
@@ -12,23 +12,50 @@ export class BlogActionCreators {
   
   private actions$ = new BehaviorSubject<Action>({type: null, payload: null});
   
-  constructor(private store: Store<IAppState>, private blogService: BlogService) {
+  constructor(private appStore: Store<IAppStore>, private blogService: BlogService) {
 
     let excepts = this.actions$
       .filter(action => action.type === actions.FETCH_EXCERPTS)
-      .do(() => store.dispatch({type: actions.FETCHING_EXCERPTS}))
-      .mergeMap(action => blogService.loadExcepts(),
-        (action, payload: IBlogState[]) => ({type: actions.FETCHED_EXCERPTS, payload: {
-          date: new Date(),
-          posts: payload
-        }}));
+      .do(() => appStore.dispatch({type: actions.FETCHING_EXCERPTS}))
+      .mergeMap(
+        action => blogService.loadExcepts(),
+        (action, payload: IBlogStore[]) => ({
+          type: actions.FETCHED_EXCERPTS,
+          payload: {
+            date: new Date(),
+            posts: payload
+          }
+        })
+      );
+        
+    let body = this.actions$
+      .filter(action => action.type === actions.FETCH_BODY)
+      .do(() => appStore.dispatch({type: actions.FETCHING_BODY}))
+      .mergeMap(
+        action => blogService.loadBody(action.payload),
+        (action, payload: IBlogBody) => ({
+          type: actions.FETCHED_BODY,
+          payload: payload
+        })
+      );
 
     Observable
-      .merge(excepts)
-      .subscribe((action: Action) => store.dispatch(action));
+      .merge(excepts, body)
+      .subscribe((action: Action) => appStore.dispatch(action));
   }
   
-  loadExcerpts() {
-    this.actions$.next({type: actions.FETCH_EXCERPTS});
+  loadExcerptsAsNeeded() {
+    if(this.appStore.value.blog.posts.length === 0) {
+      this.actions$.next({type: actions.FETCH_EXCERPTS});
+    }
+  }
+  loadBody(id) {
+    let post = this.appStore.value.blog.posts.find(e=>e.id===id);
+    if(!post) {
+      console.log('TODO: deep link? load entire post');
+      // this.actions$.next({type: actions.FETCH_POST, payload: id})
+    } else if(!post.isLoaded) {
+      this.actions$.next({type: actions.FETCH_BODY, payload: id})
+    }
   }
 }
