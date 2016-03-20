@@ -7,7 +7,7 @@ import {AppComponent} from './components/app/app.component';
 bootstrap(AppComponent, [
   ROUTER_PROVIDERS,
   // PathLocationStrategy being the default, we only need to define APP_BASE_HREF
-  // provide(APP_BASE_HREF, {useValue: '/'})
+  provide(APP_BASE_HREF, {useValue: '/'})
   // Here we want to use the # strategy instead:
-  provide(LocationStrategy, {useClass: HashLocationStrategy})
+  // provide(LocationStrategy, {useClass: HashLocationStrategy})
 ]);
