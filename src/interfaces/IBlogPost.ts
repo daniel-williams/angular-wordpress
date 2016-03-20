@@ -1,5 +1,5 @@
-export interface IBlogArticle {
-  id: string,
+export interface IBlogPost {
+  id: number,
   date: Date,
   title: string,
   slug: string,

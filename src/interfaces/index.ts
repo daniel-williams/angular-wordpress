@@ -1,9 +1,12 @@
-import {IAppState} from './IAppState';
-import {IBlogArticle} from './IBlogArticle';
-import {IBlogState} from './IBlogState';
+import {IAppStore} from './IAppStore';
+import {IBlogPost} from './IBlogPost';
+import {IBlogStore} from './IBlogStore';
+import {IBlogBody} from './IBlogBody';
+
 
 export {
-  IAppState,
-  IBlogArticle,
-  IBlogState,
+  IAppStore,
+  IBlogPost,
+  IBlogBody,
+  IBlogStore,
 }

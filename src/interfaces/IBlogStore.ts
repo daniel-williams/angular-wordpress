@@ -1,6 +1,6 @@
-import {IBlogArticle} from './IBlogArticle';
+import {IBlogPost} from './IBlogPost';
 
-export interface IBlogState{
+export interface IBlogStore{
     isUpdating: boolean,
     date?: Date,
     error?: any,
@@ -8,5 +8,5 @@ export interface IBlogState{
     itemsPerPage: number,
     totalPages: number,
     activePage: number,
-    posts: Array<IBlogArticle>,
+    posts: Array<IBlogPost>,
 }

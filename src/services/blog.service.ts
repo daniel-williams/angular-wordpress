@@ -5,40 +5,45 @@ import {Observable} from 'rxjs';
 import {appSettings} from '../app.settings';
 import * as actions from '../actions/blog.action';
 import {
-  IAppState,
-  IBlogState,
-  IBlogArticle
+  IAppStore,
+  IBlogPost,
+  IBlogBody,
+  IBlogStore,
 } from '../interfaces';
 
 
 @Injectable()
 export class BlogService {
   
-  constructor(private http: Http) {
-  }
+  constructor(private http: Http) {}
   
-  public loadExcepts(): Observable<IBlogState> {
+  public loadExcepts(): Observable<IBlogStore> {
     return this.request({
       method: RequestMethod.Get,
       url: appSettings.blog.EXCERPTS
-    }).map(res => res.map(item => this.parseExcerpt(item)));
-    // return this.http.get(appSettings.blog.EXCERPTS)
-    //   .map(res => res.json())
-    //   .map(res => res.map(item => this.parseExcerpt(item)))
-    //   .map(posts => {
-    //     return {
-    //       type: actions.FETCH_EXCERPTS_SUCCESS,
-    //       payload: {
-    //         date: new Date(),
-    //         posts: posts
-    //       }
-    //     }
-    //   });
+    }).map(res => res.map(item => Object.assign({}, item,
+      {
+        isLoaded: false,
+        date: new Date(item.date)
+      }
+    )));
   }
   
-  private parseExcerpt(item: any): IBlogArticle {
-    return <IBlogArticle> Object.assign({}, item, {isLoaded: false, date: new Date(item.date)});
+  public loadBody(id: number): Observable<IBlogBody> {
+    return this.request({
+      method: RequestMethod.Get,
+      url: appSettings.blog.getPostBodyEndpoint(id)
+    }).map(item => <IBlogBody>(
+      {
+        id: id,
+        content: item.content,
+      }
+    ));
   }
+  
+  // private parseExcerpt(item: any): IBlogPost {
+  //   return <IBlogPost> Object.assign({}, item, {isLoaded: false, date: new Date(item.date)});
+  // }
   
   request(options: any): Observable<any> {
     if (options.body) {
@@ -56,5 +61,3 @@ export class BlogService {
       .map((res: Response) => res.json());
   }
 }
-
-

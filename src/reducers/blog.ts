@@ -1,9 +1,13 @@
 import {Action, Reducer} from '@ngrx/store';
 import * as actions from '../actions/blog.action';
-import {IBlogState, IBlogArticle} from '../interfaces';
+import {
+  IBlogPost,
+  IBlogBody,
+  IBlogStore,
+} from '../interfaces';
 
 
-const initialState: IBlogState = {
+const initialState: IBlogStore = {
     isUpdating: false,
     date: null,
     error: null,
@@ -16,9 +20,8 @@ const initialState: IBlogState = {
     posts: [],
 };
 
-export const blog: Reducer<IBlogState> = (state: IBlogState = initialState, action: Action) => {
+export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
   const {type, payload} = action;
-  console.log('spy:', type, payload);
   switch(type) {
     case actions.FETCHING_EXCERPTS: {
       return Object.assign({}, state, {
@@ -35,13 +38,26 @@ export const blog: Reducer<IBlogState> = (state: IBlogState = initialState, acti
         totalPages: Math.ceil(payload.posts.length / state.itemsPerPage)
       });
     }
-    // case actions.FETCH_EXCERPTS_FAILED: {
-    //   return Object.assign({}, state, {
-    //     isUpdating: false,
-    //     date: payload.date,
-    //     error: payload.error,
-    //   });
-    // }
+
+    case actions.FETCHING_BODY: {
+      return Object.assign({}, state, {
+        isUpdating: true
+      });
+    }
+    case actions.FETCHED_BODY: {
+      return Object.assign({}, state, {
+        posts: state.posts.map(post => {
+          if(post.id === payload.id) {
+            return Object.assign({}, post, {
+              isLoaded: true,
+              content: payload.content,
+            });
+          }
+          return post;
+        })
+      });
+    }
+
     case actions.BLOG_PAGE_NEXT: {
       const totalPages = state.totalPages;
       const activePage = state.activePage;
