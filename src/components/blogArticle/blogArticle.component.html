@@ -1,0 +1,11 @@
+<div class='blog-article'>
+  <div *ngIf="!article">
+    <div>loading...</div>
+  </div>
+  <div *ngIf="article">
+    <div>
+      <h1>{{article.title}}</h1>
+      <p [innerHTML]="article.content"></p>
+    </div>
+  </div>
+</div>
