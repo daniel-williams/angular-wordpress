@@ -1,15 +1,12 @@
-import {Component, provide} from 'angular2/core';
+import {Component} from 'angular2/core';
 import {HTTP_PROVIDERS} from 'angular2/http';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
-import {provideStore} from '@ngrx/store';
 
-import {blog} from '../../reducers';
-
+import {STORE_PROVIDERS} from '../../store';
 import {HomeComponent} from '../home/home.component';
 import {AboutComponent} from '../about/about.component';
 import {BlogComponent} from '../blog/blog.component';
-import {BlogArticleComponent} from '../blogArticle/blogArticle.component';
-
+import {BlogPostComponent} from '../blogArticle/blogArticle.component';
 
 
 @Component({
@@ -17,7 +14,7 @@ import {BlogArticleComponent} from '../blogArticle/blogArticle.component';
     template: require('./app.component.html'),
     styles: [require('./app.component.scss')],
     directives: [ROUTER_DIRECTIVES],
-    providers: [HTTP_PROVIDERS, provideStore({blog})]
+    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS]
 })
 @RouteConfig([
     {
@@ -36,9 +33,9 @@ import {BlogArticleComponent} from '../blogArticle/blogArticle.component';
         component: BlogComponent
     },
     {
-      path: '/blog/:slug',
-      name: 'BlogArticle',
-      component: BlogArticleComponent
+      path: '/blog/:id',
+      name: 'BlogPost',
+      component: BlogPostComponent
     }
 ])
 export class AppComponent {
