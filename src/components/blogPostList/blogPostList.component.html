@@ -1,0 +1,7 @@
+<div class='blog-post-list'>
+  <section *ngFor="#post of posts" class='blog-post'>
+    <h2><a [routerLink]="['BlogPost', {slug:post.slug}]">{{post.title}}</a></h2>
+    <div class='date'>{{post.date | date:"dd/MM/yyyy"}}</div>
+    <p [innerHTML]="post.summary"></p>
+  </section>
+</div>

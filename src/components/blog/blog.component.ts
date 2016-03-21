@@ -1,53 +1,78 @@
 import {ChangeDetectorRef, ChangeDetectionStrategy, Component, OnInit} from 'angular2/core';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 import {Observable} from 'rxjs';
 import {Store} from '@ngrx/store';
 
 import {BlogActionCreators} from '../../actions/blog.action.creators';
-import {BlogService} from '../../services/blog.service';
+import {IAppStore} from '../../interfaces/IAppStore';
 import {
-  IAppStore,
   IBlogStore,
-  IBlogPost
-} from '../../interfaces';
+  IBlogTitle,
+  IBlogSummary,
+  IBlogBody,
+  IBlogPost,
+} from '../../interfaces/IBlogStore';
 
-import {BlogListComponent} from '../blogList/blogList.component';
+import {BlogPostListComponent} from '../blogPostList/blogPostList.component';
+import {BlogPostComponent} from '../blogPost/blogPost.component';
 
 
 @Component({
-    selector: 'blog',
-    template: require('./blog.component.html'),
-    styles: [require('./blog.component.scss')],
-    directives: [BlogListComponent, ROUTER_DIRECTIVES],
-    providers: [BlogActionCreators, BlogService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+  selector: 'blog',
+  template: require('./blog.component.html'),
+  styles: [require('./blog.component.scss')],
+  directives: [BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
+  providers: [BlogActionCreators],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BlogComponent implements OnInit {
-  
   store$: Observable<IBlogStore>;
+  
   isUpdating: boolean;
-  articles: IBlogPost[];
+  posts: IBlogPost[];
+  post: IBlogPost;
   
   constructor(
     private appStore: Store<IAppStore>,
-    private actions: BlogActionCreators,
-    private cd: ChangeDetectorRef) {
+    private routeParams: RouteParams,
+    private cd: ChangeDetectorRef,
+    private actions: BlogActionCreators) {
   }
   
   ngOnInit() {
-    this.store$ = this.appStore.select<IBlogStore>(state => state.blog);
+    const slug = this.routeParams.get('slug');
+    this.store$ = this.appStore.select(appStore => appStore.blog);
     
-    this.store$.map(e => e.isUpdating).subscribe(e => {
-      this.isUpdating = e;
+    this.store$.map(store => store.isUpdating).subscribe(isUpdating => {
+      this.isUpdating = isUpdating;
       this.cd.markForCheck();
     });
     
-    this.store$.map(e => e.posts).subscribe(e => {
-      this.articles = e;
-      this.cd.markForCheck();
-    });
+    this.actions.loadTitles();
     
-    // check for needed data in store
-    this.actions.loadExcerptsAsNeeded();
+    if(slug === null) {
+      
+      this.store$
+        .filter(store => !store.needTitles && !store.isUpdating)
+        .map(store => store.postMap)
+        .subscribe(postMap => {
+          this.posts = Object.keys(postMap).map(slug => postMap[slug]);
+          this.posts.forEach(item => item.needSummary && this.actions.loadSummary(item.slug));
+        });
+        
+    } else {
+      
+      this.store$
+        .filter(store => !store.needTitles && !store.isUpdating)
+        .map(store => store.postMap)
+        .filter(post => post[slug].needBody)
+        .subscribe(() => this.actions.loadBody(slug));
+        
+      this.store$
+        .filter(store => !store.needTitles)
+        .map(store => store.postMap)
+        .map(postMap => postMap[slug])
+        .subscribe(post => this.post = post);
+    }
   }
 }
