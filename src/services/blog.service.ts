@@ -4,12 +4,14 @@ import {Observable} from 'rxjs';
 
 import {appSettings} from '../app.settings';
 import * as actions from '../actions/blog.action';
+import {IAppStore} from '../interfaces/IAppStore';
 import {
-  IAppStore,
-  IBlogPost,
-  IBlogBody,
   IBlogStore,
-} from '../interfaces';
+  IBlogTitle,
+  IBlogSummary,
+  IBlogBody,
+  IBlogPost,
+} from '../interfaces/IBlogStore';
 
 
 @Injectable()
@@ -17,35 +19,27 @@ export class BlogService {
   
   constructor(private http: Http) {}
   
-  public loadExcepts(): Observable<IBlogStore> {
+  public fetchTitles(): Observable<IBlogTitle[]> {
     return this.request({
       method: RequestMethod.Get,
-      url: appSettings.blog.EXCERPTS
-    }).map(res => res.map(item => Object.assign({}, item,
-      {
-        isLoaded: false,
-        date: new Date(item.date)
-      }
-    )));
+      url: appSettings.blog.getTitlesUrl()})
   }
   
-  public loadBody(id: number): Observable<IBlogBody> {
+  public fetchSummary(id: number): Observable<IBlogSummary> {
     return this.request({
       method: RequestMethod.Get,
-      url: appSettings.blog.getPostBodyEndpoint(id)
-    }).map(item => <IBlogBody>(
-      {
-        id: id,
-        content: item.content,
-      }
-    ));
+      url: appSettings.blog.getSummaryUrl(id)})
   }
   
-  // private parseExcerpt(item: any): IBlogPost {
-  //   return <IBlogPost> Object.assign({}, item, {isLoaded: false, date: new Date(item.date)});
-  // }
+  public fetchBody(id: number): Observable<IBlogBody> {
+    return this.request({
+      method: RequestMethod.Get,
+      url: appSettings.blog.getBodyUrl(id)})
+  }
   
-  request(options: any): Observable<any> {
+  
+  // private helpers
+  private request(options: any): Observable<any> {
     if (options.body) {
       if (typeof options.body !== 'string') {
         options.body = JSON.stringify(options.body);
@@ -58,6 +52,6 @@ export class BlogService {
 
     return this.http
       .request(new Request(options))
-      .map((res: Response) => res.json());
+      .map(res => res.json());
   }
 }
