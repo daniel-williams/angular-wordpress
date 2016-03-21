@@ -10,11 +10,25 @@ class AppSettings {
 
 
 class BlogEndpoints {
-  public API_ROOT: string = 'http://blogabit.com/wp-json/wp/v2/';
-  public EXCERPTS: string = this.API_ROOT + 'posts?_query=[].{id:id,date:date,title:title.rendered,slug:slug,excerpt:excerpt.rendered}';
-  public getPostBodyEndpoint(id: number): string {
-    return `${this.API_ROOT}posts/${id}?_query={id:id,content:content.rendered}`;
+  private API_ROOT: string = 'http://blogabit.com/wp-json/wp/v2/';
+  
+  public getPostsEndpoint(q: string) : string {
+    return `${this.API_ROOT}posts${q}`;
   }
+  public getPostEndpoint(id: number, q: string): string {
+    return `${this.API_ROOT}posts/${id}${q}`;
+  }
+  
+  public getTitlesUrl(): string {
+    return this.getPostsEndpoint('?_query=[].{id:id,title:title.rendered,slug:slug,date:date}');
+  }
+  public getSummaryUrl(id: number): string {
+    return this.getPostEndpoint(id, '?_query={id:id,summary:excerpt.rendered}');
+  }
+  public getBodyUrl(id: number): string {
+    return this.getPostEndpoint(id, '?_query={id:id,body:content.rendered}');
+  }
+  
 }
 
 export const appSettings: AppSettings = new AppSettings();
