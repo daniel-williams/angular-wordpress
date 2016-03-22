@@ -1,9 +1,5 @@
 
 export interface IBlogStore {
-    isUpdating: boolean,
-    date?: Date,
-    error?: any,
-    
     needTitles: boolean,
     postMap?: any,
     
@@ -11,6 +7,10 @@ export interface IBlogStore {
     itemsPerPage: number,
     totalPages: number,
     activePage: number,
+    
+    isUpdating: boolean,
+    date?: Date,
+    error?: any,
 }
 
 
@@ -25,6 +25,8 @@ export interface IBlogPost {
   
   needBody: boolean,
   body?: string,
+  
+  isUpdating: boolean,
 }
 
 

@@ -20,14 +20,12 @@ const initialState: IBlogStore = {
 export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
   const {type, payload} = action;
   switch(type) {
-    case actions.FETCHING_TITLES:
-    case actions.FETCHING_SUMMARY:
-    case actions.FETCHING_BODY: {
+    
+    case actions.FETCHING_TITLES:{
       return Object.assign({}, state, {
         isUpdating: true
       });
     }
-
     case actions.FETCHED_TITLES: {
       return Object.assign({}, state, {
         isUpdating: false,
@@ -35,21 +33,28 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
         postMap: payload.postMap,
       });
     }
+    
+    case actions.FETCHING_SUMMARY:
+    case actions.FETCHING_BODY: {
+      return Object.assign({}, state, {
+        postMap: Object.assign({}, state.postMap, {
+          [payload.slug]: Object.assign({}, state.postMap[payload.slug], {isUpdating: true}),
+        }),
+      });
+    }
 
     case actions.FETCHED_SUMMARY: {
       return Object.assign({}, state, {
-        isUpdating: false,
         postMap: Object.assign({}, state.postMap, {
-          [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.summary, {needSummary: false}),
+          [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.summary, {needSummary: false, isUpdating: false}),
         }),
       });
     }
 
     case actions.FETCHED_BODY: {
       return Object.assign({}, state, {
-        isUpdating: false,
         postMap: Object.assign({}, state.postMap, {
-          [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.body, {needBody: false}),
+          [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.body, {needBody: false, isUpdating: false}),
         }),
       });
     }

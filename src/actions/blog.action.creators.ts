@@ -36,7 +36,12 @@ export class BlogActionCreators {
 
     let fetchSummary = this.actions$
       .filter(action => action.type === actions.FETCH_SUMMARY)
-      .do(() => appStore.dispatch({type: actions.FETCHING_SUMMARY}))
+      .do(action => appStore.dispatch({
+        type: actions.FETCHING_SUMMARY,
+        payload: {
+          slug: action.payload.slug,
+        }
+      }))
       .mergeMap(
         action => blogService.fetchSummary(action.payload.id),
         (action, blogSummary: IBlogSummary) => ({
@@ -50,7 +55,12 @@ export class BlogActionCreators {
 
     let fetchBody = this.actions$
       .filter(action => action.type === actions.FETCH_BODY)
-      .do(() => appStore.dispatch({type: actions.FETCHING_BODY}))
+      .do(action => appStore.dispatch({
+        type: actions.FETCHING_BODY,
+        payload: {
+          slug: action.payload.slug
+        }
+      }))
       .mergeMap(
         action => blogService.fetchBody(action.payload.id),
         (action, blogBody: IBlogBody) => ({
@@ -109,6 +119,7 @@ export class BlogActionCreators {
         date: new Date(item.date),
         needSummary: true,
         needBody: true,
+        isUpdating: false,
       };
       return accum;
     }, {});
