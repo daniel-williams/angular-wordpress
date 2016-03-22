@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, ChangeDetectionStrategy, Component, OnInit} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 import {Observable} from 'rxjs';
 import {Store} from '@ngrx/store';
@@ -23,7 +23,6 @@ import {BlogPostComponent} from '../blogPost/blogPost.component';
   styles: [require('./blog.component.scss')],
   directives: [BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
   providers: [BlogActionCreators],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BlogComponent implements OnInit {
   store$: Observable<IBlogStore>;
@@ -35,7 +34,6 @@ export class BlogComponent implements OnInit {
   constructor(
     private appStore: Store<IAppStore>,
     private routeParams: RouteParams,
-    private cd: ChangeDetectorRef,
     private actions: BlogActionCreators) {
   }
   
@@ -45,19 +43,21 @@ export class BlogComponent implements OnInit {
     
     this.store$.map(store => store.isUpdating).subscribe(isUpdating => {
       this.isUpdating = isUpdating;
-      this.cd.markForCheck();
     });
     
     this.actions.loadTitles();
     
     if(slug === null) {
-      
-      this.store$
-        .filter(store => !store.needTitles && !store.isUpdating)
-        .map(store => store.postMap)
-        .subscribe(postMap => {
-          this.posts = Object.keys(postMap).map(slug => postMap[slug]);
-          this.posts.forEach(item => item.needSummary && this.actions.loadSummary(item.slug));
+      let post$ = this.store$
+        .filter(store => !store.needTitles)
+        .map(store => Object.keys(store.postMap).map(slug => store.postMap[slug]));
+
+      post$.subscribe(posts => this.posts = posts);
+
+      post$.flatMap<IBlogPost>(posts => Observable.fromArray(posts))
+        .filter(post => post.needSummary && !post.isUpdating)
+        .subscribe(post => {
+          this.actions.loadSummary(post.slug)
         });
         
     } else {
@@ -65,7 +65,7 @@ export class BlogComponent implements OnInit {
       this.store$
         .filter(store => !store.needTitles && !store.isUpdating)
         .map(store => store.postMap)
-        .filter(post => post[slug].needBody)
+        .filter(post => post[slug].needBody && !post[slug].isUpdating)
         .subscribe(() => this.actions.loadBody(slug));
         
       this.store$
@@ -75,4 +75,5 @@ export class BlogComponent implements OnInit {
         .subscribe(post => this.post = post);
     }
   }
+  
 }
