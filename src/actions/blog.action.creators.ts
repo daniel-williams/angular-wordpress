@@ -39,6 +39,7 @@ export class BlogActionCreators {
       .do(action => appStore.dispatch({
         type: actions.FETCHING_SUMMARY,
         payload: {
+          id: action.payload.id,
           slug: action.payload.slug,
         }
       }))
@@ -83,27 +84,25 @@ export class BlogActionCreators {
     }
   }
   
-  loadSummary(slug: string) {
-    const post = <IBlogPost>this.appStore.value.blog.postMap[slug];
+  loadSummary(post: IBlogPost) {
     if(post && post.needSummary) {
       this.actions$.next({
         type: actions.FETCH_SUMMARY,
         payload: {
           id: post.id,
-          slug: slug
+          slug: post.slug
         }
       });
     }
   }
   
-  loadBody(slug: string) {
-    const post = <IBlogPost>this.appStore.value.blog.postMap[slug];
+  loadBody(post: IBlogPost) {
     if(post && post.needBody) {
       this.actions$.next({
         type: actions.FETCH_BODY,
         payload: {
           id: post.id,
-          slug: slug
+          slug: post.slug
         }
       });
     }

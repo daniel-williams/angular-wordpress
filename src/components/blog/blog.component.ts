@@ -36,43 +36,44 @@ export class BlogComponent implements OnInit {
     private routeParams: RouteParams,
     private actions: BlogActionCreators) {
   }
-  
+
   ngOnInit() {
     const slug = this.routeParams.get('slug');
     this.store$ = this.appStore.select(appStore => appStore.blog);
-    
-    this.store$.map(store => store.isUpdating).subscribe(isUpdating => {
-      this.isUpdating = isUpdating;
-    });
-    
+
+    this.store$
+      .map(store => store.isUpdating)
+      .subscribe(isUpdating => {
+        this.isUpdating = isUpdating;
+      });
+
     this.actions.loadTitles();
-    
+
     if(slug === null) {
       let post$ = this.store$
         .filter(store => !store.needTitles)
-        .map(store => Object.keys(store.postMap).map(slug => store.postMap[slug]));
+        .map(store => store.postMap)
+        .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
+        .do(posts => this.posts = posts)
+        .flatMap<IBlogPost>(posts => Observable.fromArray(posts))
 
-      post$.subscribe(posts => this.posts = posts);
-
-      post$.flatMap<IBlogPost>(posts => Observable.fromArray(posts))
+      post$
         .filter(post => post.needSummary && !post.isUpdating)
-        .subscribe(post => {
-          this.actions.loadSummary(post.slug)
-        });
-        
+        .distinctUntilChanged()
+        .subscribe(post => this.actions.loadSummary(post));
+
     } else {
-      
-      this.store$
-        .filter(store => !store.needTitles && !store.isUpdating)
-        .map(store => store.postMap)
-        .filter(post => post[slug].needBody && !post[slug].isUpdating)
-        .subscribe(() => this.actions.loadBody(slug));
-        
-      this.store$
+
+      let post$ = this.store$
         .filter(store => !store.needTitles)
-        .map(store => store.postMap)
-        .map(postMap => postMap[slug])
-        .subscribe(post => this.post = post);
+        .map(store => store.postMap[slug]);
+
+      post$
+        .do(post => this.post = post)
+        .filter(post => post.needBody && !post.isUpdating)
+        .do(post => console.log('woof:', post))
+        .subscribe(post => this.actions.loadBody(post));
+
     }
   }
   
