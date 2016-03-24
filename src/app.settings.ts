@@ -10,23 +10,20 @@ class AppSettings {
 
 
 class BlogEndpoints {
-  private API_ROOT: string = 'http://blogabit.com/wp-json/wp/v2/';
+  private API_ROOT: string = 'http://blog.skyberrystudio.com/api/';
   
   public getPostsEndpoint(q: string) : string {
-    return `${this.API_ROOT}posts${q}`;
+    return `${this.API_ROOT}get_posts/?${q}`;
   }
   public getPostEndpoint(id: number, q: string): string {
-    return `${this.API_ROOT}posts/${id}${q}`;
+    return `${this.API_ROOT}get_post/?post_id=${id}&${q}`;
   }
   
-  public getTitlesUrl(): string {
-    return this.getPostsEndpoint('?_query=[].{id:id,title:title.rendered,slug:slug,date:date}');
-  }
-  public getSummaryUrl(id: number): string {
-    return this.getPostEndpoint(id, '?_query={id:id,summary:excerpt.rendered}');
+  public getSummariesUrl(): string {
+    return this.getPostsEndpoint('include=id,title,slug,date,excerpt&count=500');
   }
   public getBodyUrl(id: number): string {
-    return this.getPostEndpoint(id, '?_query={id:id,body:content.rendered}');
+    return this.getPostEndpoint(id, 'include=content');
   }
   
 }

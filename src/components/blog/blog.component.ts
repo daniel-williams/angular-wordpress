@@ -1,13 +1,13 @@
 import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 import {Observable} from 'rxjs';
+import {distinct} from 'rxjs/operator/distinct';
 import {Store} from '@ngrx/store';
 
 import {BlogActionCreators} from '../../actions/blog.action.creators';
 import {IAppStore} from '../../interfaces/IAppStore';
 import {
   IBlogStore,
-  IBlogTitle,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
@@ -39,6 +39,7 @@ export class BlogComponent implements OnInit {
 
   ngOnInit() {
     const slug = this.routeParams.get('slug');
+    const page: number = +(this.routeParams.get('page') || 1);
     this.store$ = this.appStore.select(appStore => appStore.blog);
 
     this.store$
@@ -47,34 +48,30 @@ export class BlogComponent implements OnInit {
         this.isUpdating = isUpdating;
       });
 
-    this.actions.loadTitles();
+    this.actions.loadSummaries();
+
+    var postMap$ = this.store$
+      .filter(store => !store.needSummaries)
+      .map(store => store.postMap);
 
     if(slug === null) {
-      let post$ = this.store$
-        .filter(store => !store.needTitles)
-        .map(store => store.postMap)
+      let skip = page * 5 - 5;
+      console.log('skip', skip, page);
+      postMap$
         .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
-        .do(posts => this.posts = posts)
-        .flatMap<IBlogPost>(posts => Observable.fromArray(posts))
-
-      post$
-        .filter(post => post.needSummary && !post.isUpdating)
-        .distinctUntilChanged()
-        .subscribe(post => this.actions.loadSummary(post));
-
+        .subscribe(posts => this.posts = posts.slice(skip, skip + 5))
     } else {
-
-      let post$ = this.store$
-        .filter(store => !store.needTitles)
-        .map(store => store.postMap[slug]);
+      let post$ = postMap$
+        .map(postMap => postMap[slug]);
 
       post$
-        .do(post => this.post = post)
-        .filter(post => post.needBody && !post.isUpdating)
-        .do(post => console.log('woof:', post))
-        .subscribe(post => this.actions.loadBody(post));
+        .subscribe(post => this.post = post);
 
+      post$
+        .filter(post => post.needBody && !post.isUpdating)
+        .subscribe(post => this.actions.loadBody(post));
     }
+
   }
   
 }

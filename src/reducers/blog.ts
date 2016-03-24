@@ -13,7 +13,7 @@ const initialState: IBlogStore = {
     totalPages: 0,
     activePage: 1,
 
-    needTitles: true,
+    needSummaries: true,
     postMap: {},
 };
 
@@ -21,20 +21,14 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
   const {type, payload} = action;
   switch(type) {
     
-    case actions.FETCHING_TITLES:{
+    case actions.FETCHING_SUMMARIES:{
       return Object.assign({}, state, {
         isUpdating: true
       });
     }
-    case actions.FETCHED_TITLES: {
-      return Object.assign({}, state, {
-        isUpdating: false,
-        needTitles: false,
-        postMap: payload.postMap,
-      });
+    case actions.FETCHED_SUMMARIES: {
+      return Object.assign({}, state, payload, {isUpdating: false, needSummaries: false});
     }
-    
-    case actions.FETCHING_SUMMARY:
     case actions.FETCHING_BODY: {
       return Object.assign({}, state, {
         postMap: Object.assign({}, state.postMap, {
@@ -42,15 +36,6 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
         }),
       });
     }
-
-    case actions.FETCHED_SUMMARY: {
-      return Object.assign({}, state, {
-        postMap: Object.assign({}, state.postMap, {
-          [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.summary, {needSummary: false, isUpdating: false}),
-        }),
-      });
-    }
-
     case actions.FETCHED_BODY: {
       return Object.assign({}, state, {
         postMap: Object.assign({}, state.postMap, {
@@ -58,7 +43,6 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
         }),
       });
     }
-
 
     case actions.BLOG_PAGE_NEXT: {
       const totalPages = state.totalPages;

@@ -1,6 +1,6 @@
 
 export interface IBlogStore {
-    needTitles: boolean,
+    needSummaries: boolean,
     postMap?: any,
     
     totalPostCount: number,
@@ -30,17 +30,12 @@ export interface IBlogPost {
 }
 
 
-export interface IBlogTitle {
+export interface IBlogSummary {
   id: number,
   title: string,
   slug: string,
   date: Date,
-}
-
-export interface IBlogSummary {
-  id: number,
   summary: string,
-  needSummary: boolean,
 }
 
 export interface IBlogBody {

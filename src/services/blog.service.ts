@@ -7,7 +7,6 @@ import * as actions from '../actions/blog.action';
 import {IAppStore} from '../interfaces/IAppStore';
 import {
   IBlogStore,
-  IBlogTitle,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
@@ -19,16 +18,10 @@ export class BlogService {
   
   constructor(private http: Http) {}
   
-  public fetchTitles(): Observable<IBlogTitle[]> {
+  public fetchSummaries(): Observable<IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,
-      url: appSettings.blog.getTitlesUrl()})
-  }
-  
-  public fetchSummary(id: number): Observable<IBlogSummary> {
-    return this.request({
-      method: RequestMethod.Get,
-      url: appSettings.blog.getSummaryUrl(id)})
+      url: appSettings.blog.getSummariesUrl()})
   }
   
   public fetchBody(id: number): Observable<IBlogBody> {

@@ -6,7 +6,6 @@ import {BlogService} from '../services/blog.service';
 import {IAppStore} from '../interfaces/IAppStore';
 import {
   IBlogStore,
-  IBlogTitle,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
@@ -21,38 +20,16 @@ export class BlogActionCreators {
   
   constructor(private appStore: Store<IAppStore>, private blogService: BlogService) {
 
-    const fetchTitles = this.actions$
-      .filter(action => action.type === actions.FETCH_TITLES)
-      .do(() => appStore.dispatch({type: actions.FETCHING_TITLES}))
+    const fetchSummaries = this.actions$
+      .filter(action => action.type === actions.FETCH_SUMMARIES)
+      .do(() => appStore.dispatch({type: actions.FETCHING_SUMMARIES}))
       .mergeMap(
-        action => blogService.fetchTitles(),
-        (action, blogTitles: IBlogTitle[]) => ({
-          type: actions.FETCHED_TITLES,
-          payload: {
-            postMap: this.blogTitlesToPostMap(blogTitles),
-          }
+        action => blogService.fetchSummaries(),
+        (action, json: any) => ({
+          type: actions.FETCHED_SUMMARIES,
+          payload: this.toSummariesPayload(json),
         })
       )
-
-    let fetchSummary = this.actions$
-      .filter(action => action.type === actions.FETCH_SUMMARY)
-      .do(action => appStore.dispatch({
-        type: actions.FETCHING_SUMMARY,
-        payload: {
-          id: action.payload.id,
-          slug: action.payload.slug,
-        }
-      }))
-      .mergeMap(
-        action => blogService.fetchSummary(action.payload.id),
-        (action, blogSummary: IBlogSummary) => ({
-          type: actions.FETCHED_SUMMARY,
-          payload: {
-            slug: action.payload.slug,
-            summary: blogSummary,
-          }
-        })
-      );
 
     let fetchBody = this.actions$
       .filter(action => action.type === actions.FETCH_BODY)
@@ -64,35 +41,23 @@ export class BlogActionCreators {
       }))
       .mergeMap(
         action => blogService.fetchBody(action.payload.id),
-        (action, blogBody: IBlogBody) => ({
+        (action, json: any) => ({
           type: actions.FETCHED_BODY,
           payload: {
             slug: action.payload.slug,
-            body: blogBody,
+            body: this.toBody(json),
           }
         })
       );
 
     Observable
-      .merge(fetchTitles, fetchSummary, fetchBody)
+      .merge(fetchSummaries, fetchBody)
       .subscribe((action: Action) => appStore.dispatch(action));
   }
 
-  loadTitles() {
-    if(this.appStore.value.blog.needTitles) {
-      this.actions$.next({type: actions.FETCH_TITLES});
-    }
-  }
-  
-  loadSummary(post: IBlogPost) {
-    if(post && post.needSummary) {
-      this.actions$.next({
-        type: actions.FETCH_SUMMARY,
-        payload: {
-          id: post.id,
-          slug: post.slug
-        }
-      });
+  loadSummaries() {
+    if(this.appStore.value.blog.needSummaries) {
+      this.actions$.next({type: actions.FETCH_SUMMARIES});
     }
   }
   
@@ -109,18 +74,33 @@ export class BlogActionCreators {
   }
   
   
-  private blogTitlesToPostMap(blogTitles) {
-    return blogTitles.reduce((accum, item) => {
+  private toSummariesPayload(json) {
+    let postMap = json.posts.reduce((accum, item) => {
       accum[item.slug] = {
         id: item.id,
         title: item.title,
         slug: item.slug,
         date: new Date(item.date),
-        needSummary: true,
+        summary: item.excerpt,
         needBody: true,
         isUpdating: false,
       };
       return accum;
     }, {});
+    let totalPostCount = json.count_total;
+    let totalPages = Math.ceil(totalPostCount / 5);
+    
+    return {
+      totalPostCount,
+      totalPages,
+      postMap,
+    } 
+  }
+  private toBody(json) {
+    let post = json.post;
+    return {
+      id: post.id,
+      body: post.content,
+    }
   }
 }
