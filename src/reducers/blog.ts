@@ -21,7 +21,7 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
   const {type, payload} = action;
   switch(type) {
     
-    case actions.FETCHING_SUMMARIES:{
+    case actions.FETCHING_SUMMARIES: {
       return Object.assign({}, state, {
         isUpdating: true
       });

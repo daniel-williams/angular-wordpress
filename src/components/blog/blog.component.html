@@ -1,5 +1,13 @@
 <div class='blog'>
   <div><h1>Blog</h1></div>
-  <blog-post *ngIf="post" [post]="post"></blog-post>
-  <blog-post-list *ngIf="!post && posts" [posts]="posts" ></blog-post-list>
+  <pager
+    *ngIf='!post && posts'
+    [isFirst]="isFirst"
+    [isLast]="isLast"
+    [status]="getStatus()"
+    (onPrevious)="onPrevious()"
+    (onNext)="onNext()"
+    ></pager>
+  <blog-post *ngIf='post' [post]='post'></blog-post>
+  <blog-post-list *ngIf='!post && posts' [posts]='posts' ></blog-post-list>
 </div>

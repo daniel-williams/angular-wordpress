@@ -1,5 +1,5 @@
 import {Component, OnInit} from 'angular2/core';
-import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
+import {ROUTER_DIRECTIVES, Router, RouteParams} from 'angular2/router';
 import {Observable} from 'rxjs';
 import {distinct} from 'rxjs/operator/distinct';
 import {Store} from '@ngrx/store';
@@ -13,6 +13,7 @@ import {
   IBlogPost,
 } from '../../interfaces/IBlogStore';
 
+import {PagerComponent} from '../pager/pager.component';
 import {BlogPostListComponent} from '../blogPostList/blogPostList.component';
 import {BlogPostComponent} from '../blogPost/blogPost.component';
 
@@ -21,31 +22,42 @@ import {BlogPostComponent} from '../blogPost/blogPost.component';
   selector: 'blog',
   template: require('./blog.component.html'),
   styles: [require('./blog.component.scss')],
-  directives: [BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
+  directives: [PagerComponent, BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
   providers: [BlogActionCreators],
 })
 export class BlogComponent implements OnInit {
   store$: Observable<IBlogStore>;
   
   isUpdating: boolean;
+  isFirst: boolean;
+  isLast: boolean;
+  
+  itemsPerPage: number;
+  totalPages: number;
+  currentPage: number;
+  
   posts: IBlogPost[];
   post: IBlogPost;
   
   constructor(
     private appStore: Store<IAppStore>,
+    private router: Router,
     private routeParams: RouteParams,
     private actions: BlogActionCreators) {
   }
 
   ngOnInit() {
-    const slug = this.routeParams.get('slug');
-    const page: number = +(this.routeParams.get('page') || 1);
+    const slug: string = this.routeParams.get('slug');
+    this.currentPage = +(this.routeParams.get('page') || 1);
     this.store$ = this.appStore.select(appStore => appStore.blog);
 
     this.store$
-      .map(store => store.isUpdating)
-      .subscribe(isUpdating => {
-        this.isUpdating = isUpdating;
+      .subscribe(store => {
+        this.isUpdating = store.isUpdating;
+        this.itemsPerPage = store.itemsPerPage;
+        this.totalPages = store.totalPages;
+        this.isFirst = this.currentPage === 1;
+        this.isLast = this.currentPage === this.totalPages;
       });
 
     this.actions.loadSummaries();
@@ -55,11 +67,10 @@ export class BlogComponent implements OnInit {
       .map(store => store.postMap);
 
     if(slug === null) {
-      let skip = page * 5 - 5;
-      console.log('skip', skip, page);
+      let skip = this.currentPage * this.itemsPerPage - this.itemsPerPage;
       postMap$
         .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
-        .subscribe(posts => this.posts = posts.slice(skip, skip + 5))
+        .subscribe(posts => this.posts = posts.slice(skip, skip + this.itemsPerPage))
     } else {
       let post$ = postMap$
         .map(postMap => postMap[slug]);
@@ -72,6 +83,21 @@ export class BlogComponent implements OnInit {
         .subscribe(post => this.actions.loadBody(post));
     }
 
+  }
+  
+  getStatus(): string {
+    return `${this.currentPage} of ${this.totalPages}`;
+  }
+  
+  onNext(event) {
+    if(this.currentPage < this.totalPages) {
+      this.router.navigate( ['Blog', { page: this.currentPage + 1 }] );
+    }
+  }
+  onPrevious(event) {
+    if(this.currentPage > 1) {
+      this.router.navigate( ['Blog', { page: this.currentPage - 1 }] );
+    }
   }
   
 }

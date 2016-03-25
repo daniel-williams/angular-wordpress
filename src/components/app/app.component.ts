@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, ViewEncapsulation} from 'angular2/core';
 import {HTTP_PROVIDERS} from 'angular2/http';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 
@@ -15,7 +15,8 @@ import {BlogComponent} from '../blog/blog.component';
     template: require('./app.component.html'),
     styles: [require('./app.component.scss')],
     directives: [ROUTER_DIRECTIVES],
-    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS, BlogService]
+    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS, BlogService],
+    encapsulation: ViewEncapsulation.None,
 })
 @RouteConfig([
     {
