@@ -13,9 +13,9 @@ import {
   IBlogPost,
 } from '../../interfaces/IBlogStore';
 
-import {PagerComponent} from '../pager/pager.component';
-import {BlogPostListComponent} from '../blogPostList/blogPostList.component';
-import {BlogPostComponent} from '../blogPost/blogPost.component';
+import {PagerComponent} from '../../shared/pager/pager.component';
+import {BlogPostListComponent} from './blog-post-list.component';
+import {BlogPostComponent} from './blog-post.component';
 
 
 @Component({
