@@ -1,6 +1,49 @@
-.app {
-    background-color: #fff;
+$yellow: #ff9e1b;
+$orange: #e57200;
+$charcoal: #222;
+$gravel: #333;
+$white: #fff;
+
+a {
+  transition: color .3s;
+  color: $yellow;
 }
-p {
-  background-color: red;
+a:hover, a:focus {
+  color: $orange;
+  text-decoration: none !important;
+}
+
+
+.btn {
+  white-space: normal;
+
+  &.btn-primary {
+    color: $white;
+    background-color: $yellow;
+    border-color: darken($yellow, 10%);
+
+    &:hover, &:focus, &:active &.active {
+      color: $white;
+      background-color: $orange;
+      border-color: darken($orange, 15%);;
+
+      &.disabled {
+        background-color: lighten($yellow, 10%);
+        border-color: lighten($yellow, 20%);
+      }
+    }
+    &.disabled {
+      background-color: lighten($yellow, 10%);
+      border-color: lighten($yellow, 20%);
+    }
+  }
+  &.btn-default {
+    color: $gravel;
+    background-color: $white;
+    border-color: darken($white, 30%);
+
+    &:hover {
+      background-color: #e6e6e6;
+    }
+  }
 }
