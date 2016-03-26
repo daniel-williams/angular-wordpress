@@ -13,7 +13,8 @@ export class FetchingComponent implements OnInit, OnDestroy {
   
   private timer: any = null;
   private idx: number = -1;
-  private boxes: Array<boolean> = new Array(this.count).fill(false);
+  private BOXES_INITIAL: Array<boolean> = new Array(this.count).fill(false); 
+  private boxes: Array<boolean>;
   
   constructor() { }
 
@@ -21,7 +22,7 @@ export class FetchingComponent implements OnInit, OnDestroy {
     this.timer = setInterval(() => {
       var n = this.idx + 1;
       if(n === this.count) { n = 0; }
-      this.boxes = new Array(this.count).fill(false);
+      this.boxes = this.BOXES_INITIAL.slice();
       this.boxes[n] = true;
       this.idx = n;
     }, this.interval);
@@ -32,8 +33,4 @@ export class FetchingComponent implements OnInit, OnDestroy {
     }
   }
 
-}
-
-class Box {
-  on: boolean = false
 }
