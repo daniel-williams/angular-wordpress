@@ -2,7 +2,7 @@ import {Component} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {FetchingComponent} from '../../shared/fetching/fetching.component';
-import {IBlogPost} from '../../interfaces/IBlogStore';
+import {IBlogPost} from '../models';
 
 
 @Component({

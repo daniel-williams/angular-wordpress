@@ -2,14 +2,14 @@ import {Injectable, Inject} from 'angular2/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
-import {BlogService} from '../services/blog.service';
-import {IAppStore} from '../interfaces/IAppStore';
+import {IAppStore} from '../store';
+import {BlogService} from './blog.service';
 import {
   IBlogStore,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
-} from '../interfaces/IBlogStore';
+} from './models';
 import * as actions from './blog.action';
 
 
@@ -87,12 +87,12 @@ export class BlogActionCreators {
       };
       return accum;
     }, {});
-    let totalPostCount = json.count_total;
-    let totalPages = Math.ceil(totalPostCount / 5);
+    let postCount = json.count_total;
+    let pageCount = Math.ceil(postCount / 5);
     
     return {
-      totalPostCount,
-      totalPages,
+      postCount,
+      pageCount,
       postMap,
     } 
   }

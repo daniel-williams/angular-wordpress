@@ -1,6 +1,7 @@
 import {Action, Reducer} from '@ngrx/store';
-import * as actions from '../actions/blog.action';
-import {IBlogStore} from '../interfaces/IBlogStore';
+
+import {IBlogStore} from './models';
+import * as actions from './blog.action';
 
 
 const initialState: IBlogStore = {
@@ -8,16 +9,16 @@ const initialState: IBlogStore = {
     date: null,
     error: null,
 
-    totalPostCount: 0,
-    itemsPerPage: 5,
-    totalPages: 0,
-    activePage: 1,
+    postCount: 0,
+    postsPerPage: 5,
+    pageCount: 0,
+    currentPage: 1,
 
     needSummaries: true,
     postMap: {},
 };
 
-export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
+export const BlogReducer: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
   const {type, payload} = action;
   switch(type) {
     
@@ -45,20 +46,20 @@ export const blog: Reducer<IBlogStore> = (state: IBlogStore = initialState, acti
     }
 
     case actions.BLOG_PAGE_NEXT: {
-      const totalPages = state.totalPages;
-      const activePage = state.activePage;
+      const pageCount = state.pageCount;
+      const currentPage = state.currentPage;
       return Object.assign({}, state, {
-        activePage: activePage < totalPages
-          ? activePage + 1
-          : activePage,
+        currentPage: currentPage < pageCount
+          ? currentPage + 1
+          : currentPage,
       });
     }
     case actions.BLOG_PAGE_PREV: {
-      const activePage = state.activePage;
+      const currentPage = state.currentPage;
       return Object.assign({}, state, {
-        activePage: activePage > 1
-          ? activePage - 1
-          : activePage,
+        currentPage: currentPage > 1
+          ? currentPage - 1
+          : currentPage,
       });
     }
     default: {

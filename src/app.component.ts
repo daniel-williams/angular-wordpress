@@ -3,11 +3,10 @@ import {HTTP_PROVIDERS} from 'angular2/http';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {STORE_PROVIDERS} from './store';
-import {BlogService} from './services/blog.service';
 
-import {HomeComponent} from './home/home.component';
-import {AboutComponent} from './about/about.component';
-import {BlogComponent} from './blog/components/blog.component';
+import {HomeComponent} from './home';
+import {AboutComponent} from './about';
+import {BlogComponent, BlogService} from './blog';
 
 
 @Component({

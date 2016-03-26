@@ -2,32 +2,36 @@ import {Injectable} from 'angular2/core';
 import {Headers, Http, Request, RequestMethod, Response} from 'angular2/http';
 import {Observable} from 'rxjs';
 
-import {appSettings} from '../app.settings';
-import * as actions from '../actions/blog.action';
-import {IAppStore} from '../interfaces/IAppStore';
+import {IAppStore} from '../store';
 import {
   IBlogStore,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
-} from '../interfaces/IBlogStore';
+} from './models';
+import {BLOG_URL} from './blog.config';
+import * as actions from './blog.action';
 
 
 @Injectable()
 export class BlogService {
   
-  constructor(private http: Http) {}
+  private API_ROOT: string;
+  
+  constructor(private http: Http) {
+     this.API_ROOT = `http://${BLOG_URL}/api/`;
+  }
   
   public fetchSummaries(): Observable<IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,
-      url: appSettings.blog.getSummariesUrl()})
+      url: this.getSummariesUrl()})
   }
   
   public fetchBody(id: number): Observable<IBlogBody> {
     return this.request({
       method: RequestMethod.Get,
-      url: appSettings.blog.getBodyUrl(id)})
+      url: this.getBodyUrl(id)})
   }
   
   
@@ -46,5 +50,18 @@ export class BlogService {
     return this.http
       .request(new Request(options))
       .map(res => res.json());
+  }
+  
+  private getPostsEndpoint(q: string) : string {
+    return `${this.API_ROOT}get_posts/?${q}`;
+  }
+  private getPostEndpoint(id: number, q: string): string {
+    return `${this.API_ROOT}get_post/?post_id=${id}&${q}`;
+  }
+  private getSummariesUrl(): string {
+    return this.getPostsEndpoint('include=id,title,slug,date,excerpt&count=500');
+  }
+  private getBodyUrl(id: number): string {
+    return this.getPostEndpoint(id, 'include=content');
   }
 }

@@ -4,18 +4,18 @@ import {Observable} from 'rxjs';
 import {distinct} from 'rxjs/operator/distinct';
 import {Store} from '@ngrx/store';
 
-import {BlogActionCreators} from '../../actions/blog.action.creators';
-import {IAppStore} from '../../interfaces/IAppStore';
+import {IAppStore} from '../../store';
+import {PagerComponent} from '../../shared/pager/pager.component';
+
+import {BlogActionCreators} from '../blog.action.creators';
+import {BlogPostComponent} from './blog-post.component';
+import {BlogPostListComponent} from './blog-post-list.component';
 import {
   IBlogStore,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
-} from '../../interfaces/IBlogStore';
-
-import {PagerComponent} from '../../shared/pager/pager.component';
-import {BlogPostListComponent} from './blog-post-list.component';
-import {BlogPostComponent} from './blog-post.component';
+} from '../models';
 
 
 @Component({
@@ -32,8 +32,8 @@ export class BlogComponent implements OnInit {
   isFirst: boolean;
   isLast: boolean;
   
-  itemsPerPage: number;
-  totalPages: number;
+  postsPerPage: number;
+  pageCount: number;
   currentPage: number;
   
   posts: IBlogPost[];
@@ -54,10 +54,10 @@ export class BlogComponent implements OnInit {
     this.store$
       .subscribe(store => {
         this.isUpdating = store.isUpdating;
-        this.itemsPerPage = store.itemsPerPage;
-        this.totalPages = store.totalPages;
+        this.postsPerPage = store.postsPerPage;
+        this.pageCount = store.pageCount;
         this.isFirst = this.currentPage === 1;
-        this.isLast = this.currentPage === this.totalPages;
+        this.isLast = this.currentPage === this.pageCount;
       });
 
     this.actions.loadSummaries();
@@ -67,10 +67,10 @@ export class BlogComponent implements OnInit {
       .map(store => store.postMap);
 
     if(slug === null) {
-      let skip = this.currentPage * this.itemsPerPage - this.itemsPerPage;
+      let skip = this.currentPage * this.postsPerPage - this.postsPerPage;
       postMap$
         .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
-        .subscribe(posts => this.posts = posts.slice(skip, skip + this.itemsPerPage))
+        .subscribe(posts => this.posts = posts.slice(skip, skip + this.postsPerPage))
     } else {
       let post$ = postMap$
         .map(postMap => postMap[slug]);
@@ -86,11 +86,11 @@ export class BlogComponent implements OnInit {
   }
   
   getStatus(): string {
-    return `${this.currentPage} of ${this.totalPages}`;
+    return `${this.currentPage} of ${this.pageCount}`;
   }
   
   onNext(event) {
-    if(this.currentPage < this.totalPages) {
+    if(this.currentPage < this.pageCount) {
       this.router.navigate( ['Blog', { page: this.currentPage + 1 }] );
     }
   }
