@@ -1,21 +1,21 @@
-import { Component, OnInit, EventEmitter } from 'angular2/core';
+import {Component, OnInit, EventEmitter, Input, Output} from 'angular2/core';
 
 
 @Component({
   selector: 'pager',
   template: require('./pager.component.html'),
   styles: [require('./pager.component.scss')],
-  inputs: ['status', 'isFirst', 'isLast'],
-  outputs: ['onPrevious', 'onNext'],
 })
 export class PagerComponent implements OnInit {
+  @Input() status: string;
+  @Input() isFirst: boolean = false;
+  @Input() isLast: boolean = false;
   
-  isFirst: boolean = false;
-  isLast: boolean = false;
-  onPrevious: EventEmitter<any> = new EventEmitter();
-  onNext: EventEmitter<any> = new EventEmitter();
-  prevBtnClasses: any = {};
-  nextBtnClasses: any = {};
+  @Output() onPrevious: EventEmitter<any> = new EventEmitter();
+  @Output() onNext: EventEmitter<any> = new EventEmitter();
+  
+  private prevBtnClasses: any = {};
+  private nextBtnClasses: any = {};
   
   constructor() {}
   
@@ -33,12 +33,10 @@ export class PagerComponent implements OnInit {
   }
 
   prevClick(event) {
-    console.log('pager previous click');
     this.onPrevious.emit(event);
   }
   
   nextClick(event) {
-    console.log('pager next click');
     this.onNext.emit(event);
   }
 }
