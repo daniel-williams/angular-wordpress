@@ -1,7 +1,7 @@
 import path from 'path';
 import express from 'express';
 import webpack from 'webpack';
-import webpackMiddleware from 'webpack-dev-middleware';
+import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import bodyParser from 'body-parser';
 
@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 const app = express();
 const compiler = webpack(config);
 
-app.use(webpackMiddleware(compiler, {
+app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath,
     contentBase: 'src',
     stats: {

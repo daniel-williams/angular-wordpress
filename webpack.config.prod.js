@@ -1,14 +1,16 @@
 var path = require('path');
-var webpack = require("webpack");
-var webpackConfig = require('./webpack.config.dev.js');
+var webpack = require('webpack');
 
-var DIST_PATH = path.resolve('client/content/bundles');
+var webpackconfig = require('./webpack.config.js');
+var config = webpackconfig.config;
 
-webpackConfig.output.path =  DIST_PATH;
-webpackConfig.plugins.concat([
-    new webpack.optimize.OccurenceOrderPlugin(),
+config.plugins = config.plugins.concat([
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin()
 ]);
 
-module.exports = webpackConfig;
+// console.log('-----config-----');
+// console.log(config);
+// console.log('-----config-----');
+
+module.exports = config;
