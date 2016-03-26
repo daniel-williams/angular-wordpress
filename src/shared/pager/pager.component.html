@@ -1,5 +1,15 @@
 <div class='pager'>
-  <button type='button' class='btn previous' [ngClass]='prevBtnClasses' (click)='prevClick()'>newer</button>
+  <button
+    type='button'
+    class='btn previous'
+    [ngClass]='prevBtnClasses'
+    (click)='prevClick()'
+    [disabled]='isFirst'>newer</button>
   <span class='status'>{{status}}</span>
-  <button type='button' class='btn next' [ngClass]='nextBtnClasses' (click)='nextClick()'>older</button>
+  <button
+    type='button'
+    class='btn next'
+    [ngClass]='nextBtnClasses'
+    (click)='nextClick()'
+    [disabled]='isLast'>older</button>
 </div>

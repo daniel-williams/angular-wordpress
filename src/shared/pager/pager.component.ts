@@ -1,4 +1,4 @@
-import {Component, OnInit, EventEmitter, Input, Output} from 'angular2/core';
+import {Component, OnChanges, EventEmitter, Input, Output} from 'angular2/core';
 
 
 @Component({
@@ -6,7 +6,7 @@ import {Component, OnInit, EventEmitter, Input, Output} from 'angular2/core';
   template: require('./pager.component.html'),
   styles: [require('./pager.component.scss')],
 })
-export class PagerComponent implements OnInit {
+export class PagerComponent implements OnChanges {
   @Input() status: string;
   @Input() isFirst: boolean = false;
   @Input() isLast: boolean = false;
@@ -19,7 +19,7 @@ export class PagerComponent implements OnInit {
   
   constructor() {}
   
-  ngOnInit() {
+  ngOnChanges(changes) {
     this.prevBtnClasses = {
       'disabled': this.isFirst,
       'btn-primary': !this.isFirst,
