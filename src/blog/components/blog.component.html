@@ -1,13 +1,13 @@
 <div class='blog'>
   <div><h1>Blog</h1></div>
-  <pager
-    *ngIf='!post && posts'
-    [isFirst]="isFirst"
-    [isLast]="isLast"
-    [status]="getStatus()"
-    (onPrevious)="onPrevious()"
-    (onNext)="onNext()"
-    ></pager>
   <blog-post *ngIf='post' [post]='post'></blog-post>
+  <pager
+    *ngIf='!post'
+    [isFirst]='isFirstPage()'
+    [isLast]='isLastPage()'
+    [status]='getStatus()'
+    (onPrevious)='onPrevious()'
+    (onNext)='onNext()'></pager>
+  <fetching *ngIf='!post && !posts'></fetching>
   <blog-post-list *ngIf='!post && posts' [posts]='posts' ></blog-post-list>
 </div>

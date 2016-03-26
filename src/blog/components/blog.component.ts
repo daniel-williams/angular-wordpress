@@ -6,6 +6,7 @@ import {Store} from '@ngrx/store';
 
 import {IAppStore} from '../../store';
 import {PagerComponent} from '../../shared/pager/pager.component';
+import {FetchingComponent} from '../../shared/fetching/fetching.component';
 
 import {BlogActionCreators} from '../blog.action.creators';
 import {BlogPostComponent} from './blog-post.component';
@@ -22,15 +23,13 @@ import {
   selector: 'blog',
   template: require('./blog.component.html'),
   styles: [require('./blog.component.scss')],
-  directives: [PagerComponent, BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
+  directives: [PagerComponent, FetchingComponent, BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
   providers: [BlogActionCreators],
 })
 export class BlogComponent implements OnInit {
   store$: Observable<IBlogStore>;
   
   isUpdating: boolean;
-  isFirst: boolean;
-  isLast: boolean;
   
   postsPerPage: number;
   pageCount: number;
@@ -56,8 +55,6 @@ export class BlogComponent implements OnInit {
         this.isUpdating = store.isUpdating;
         this.postsPerPage = store.postsPerPage;
         this.pageCount = store.pageCount;
-        this.isFirst = this.currentPage === 1;
-        this.isLast = this.currentPage === this.pageCount;
       });
 
     this.actions.loadSummaries();
@@ -85,8 +82,16 @@ export class BlogComponent implements OnInit {
 
   }
   
+  isFirstPage(): boolean {
+    return this.currentPage === 1;
+  }
   getStatus(): string {
-    return `${this.currentPage} of ${this.pageCount}`;
+    return this.pageCount > 0
+      ? `${this.currentPage} of ${this.pageCount}`
+      : '';
+  }
+  isLastPage(): boolean {
+    return this.currentPage === this.pageCount || this.pageCount === 0;
   }
   
   onNext(event) {
