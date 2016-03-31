@@ -15,7 +15,9 @@ const initialState: IBlogStore = {
     currentPage: 1,
 
     needSummaries: true,
+    needWidgets: true,
     postMap: {},
+    widgets: [],
 };
 
 export const BlogReducer: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
@@ -42,6 +44,18 @@ export const BlogReducer: Reducer<IBlogStore> = (state: IBlogStore = initialStat
         postMap: Object.assign({}, state.postMap, {
           [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.body, {needBody: false, isUpdating: false}),
         }),
+      });
+    }
+    case actions.FETCHING_WIDGETS: {
+      return Object.assign({}, state, {
+        isUpdating: true
+      });
+    }
+    case actions.FETCHED_WIDGETS: {
+      return Object.assign({}, state, {
+        widgets: payload,
+        isUpdating: false,
+        needWidgets: false
       });
     }
 

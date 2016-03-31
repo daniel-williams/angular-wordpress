@@ -1,13 +1,24 @@
 <div class='blog'>
   <div><h1>Blog</h1></div>
-  <blog-post *ngIf='post' [post]='post'></blog-post>
-  <pager
-    *ngIf='!post'
-    [isFirst]='isFirstPage()'
-    [isLast]='isLastPage()'
-    [status]='getStatus()'
-    (onPrevious)='onPrevious()'
-    (onNext)='onNext()'></pager>
-  <fetching *ngIf='!post && !posts'></fetching>
-  <blog-post-list *ngIf='!post && posts' [posts]='posts' ></blog-post-list>
+  <div class='row'>
+    <div class='col-xs-4'>
+      <div *ngIf='hasWidgets'>
+        <div *ngFor='#widget of widgets'>
+          <div [innerHTML]="hijackLinks(widget.content)"></div>
+        </div>
+      </div>
+    </div>
+    <div class='col-xs-8'>
+      <blog-post *ngIf='post' [post]='post'></blog-post>
+      <pager
+        *ngIf='!post'
+        [isFirst]='isFirstPage()'
+        [isLast]='isLastPage()'
+        [status]='getStatus()'
+        (onPrevious)='onPrevious()'
+        (onNext)='onNext()'></pager>
+      <fetching *ngIf='!post && !posts'></fetching>
+      <blog-post-list *ngIf='!post && posts' [posts]='posts' ></blog-post-list>
+    </div>
+  </div>
 </div>

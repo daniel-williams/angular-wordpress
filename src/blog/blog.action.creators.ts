@@ -45,13 +45,24 @@ export class BlogActionCreators {
           type: actions.FETCHED_BODY,
           payload: {
             slug: action.payload.slug,
-            body: this.toBody(json),
+            body: this.toBodyPayload(json),
           }
         })
       );
 
+    const fetchWidgets = this.actions$
+      .filter(action => action.type === actions.FETCH_WIDGETS)
+      .do(() => appStore.dispatch({type: actions.FETCHING_WIDGETS}))
+      .mergeMap(
+        action => blogService.fetchWidgets(),
+        (action, json: any) => ({
+          type: actions.FETCHED_WIDGETS,
+          payload: this.toWidgetsPayload(json),
+        })
+      )
+      
     Observable
-      .merge(fetchSummaries, fetchBody)
+      .merge(fetchSummaries, fetchBody, fetchWidgets)
       .subscribe((action: Action) => appStore.dispatch(action));
   }
 
@@ -70,6 +81,13 @@ export class BlogActionCreators {
           slug: post.slug
         }
       });
+    }
+  }
+  
+  loadWidgets() {
+    if(this.appStore.value.blog.needWidgets) {
+      console.log('loadWidgets');
+      this.actions$.next({type: actions.FETCH_WIDGETS});
     }
   }
   
@@ -96,11 +114,20 @@ export class BlogActionCreators {
       postMap,
     } 
   }
-  private toBody(json) {
+  private toBodyPayload(json) {
     let post = json.post;
     return {
       id: post.id,
       body: post.content,
     }
+  }
+  private toWidgetsPayload(json) {
+    return json.widgets.reduce((accum, item) => {
+      accum.push({
+        title: item.instance.title,
+        content: item.widget
+      });
+      return accum;
+    }, []);
   }
 }

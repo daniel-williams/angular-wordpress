@@ -1,7 +1,6 @@
 import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES, Router, RouteParams} from 'angular2/router';
 import {Observable} from 'rxjs';
-import {distinct} from 'rxjs/operator/distinct';
 import {Store} from '@ngrx/store';
 
 import {IAppStore} from '../../store';
@@ -17,6 +16,7 @@ import {
   IBlogBody,
   IBlogPost,
 } from '../models';
+var domify = require('domify');
 
 
 @Component({
@@ -30,11 +30,11 @@ export class BlogComponent implements OnInit {
   store$: Observable<IBlogStore>;
   
   isUpdating: boolean;
-  
+  hasWidgets: boolean;
+  widgets: Array<any>;
   postsPerPage: number;
   pageCount: number;
   currentPage: number;
-  
   posts: IBlogPost[];
   post: IBlogPost;
   
@@ -53,11 +53,14 @@ export class BlogComponent implements OnInit {
     this.store$
       .subscribe(store => {
         this.isUpdating = store.isUpdating;
+        this.hasWidgets = !store.needWidgets && store.widgets.length > 0;
+        this.widgets = store.widgets;
         this.postsPerPage = store.postsPerPage;
         this.pageCount = store.pageCount;
       });
 
     this.actions.loadSummaries();
+    this.actions.loadWidgets();
 
     var postMap$ = this.store$
       .filter(store => !store.needSummaries)
@@ -80,6 +83,22 @@ export class BlogComponent implements OnInit {
         .subscribe(post => this.actions.loadBody(post));
     }
 
+  }
+  
+  
+  hijackLinks(frag: string): any {
+    let htmlFrag = domify(frag);
+    console.log('--start frag--:', htmlFrag);
+    let anchors = htmlFrag.getElementsByTagName('a');
+    for(let i = 0; i < anchors.length; i++) {
+      let href = anchors[i].getAttribute('href');
+      let blogLink = document.createElement('x-blog-link');
+      console.log('blogLink',blogLink);
+      blogLink.setAttribute('href', href);
+      anchors[i].parentNode.replaceChild(blogLink, anchors[i]);
+    }
+    console.log('--end frag--:', htmlFrag);
+    return frag;
   }
   
   isFirstPage(): boolean {

@@ -6,6 +6,10 @@ export const FETCH_BODY: string = 'FETCH_BODY';
 export const FETCHING_BODY: string = 'FETCHING_BODY';
 export const FETCHED_BODY: string = 'FETCHED_BODY';
 
+export const FETCH_WIDGETS: string = 'FETCH_WIDGETS';
+export const FETCHING_WIDGETS: string = 'FETCHING_WIDGETS';
+export const FETCHED_WIDGETS: string = 'FETCHED_WIDGETS';
+
 
 export const BLOG_PAGE_NEXT: string = 'BLOG_PAGE_NEXT';
 export const BLOG_PAGE_PREV: string = 'BLOG_PAGE_PREV';

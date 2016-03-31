@@ -9,7 +9,7 @@ import {
   IBlogBody,
   IBlogPost,
 } from './models';
-import {BLOG_URL} from './blog.config';
+import {BLOG_URL, SIDE_BAR_NAME} from './blog.config';
 import * as actions from './blog.action';
 
 
@@ -32,6 +32,12 @@ export class BlogService {
     return this.request({
       method: RequestMethod.Get,
       url: this.getBodyUrl(id)})
+  }
+  
+  public fetchWidgets(): Observable<any> {
+    return this.request({
+      method: RequestMethod.Get,
+      url: this.getSideBarUrl()})
   }
   
   
@@ -63,5 +69,8 @@ export class BlogService {
   }
   private getBodyUrl(id: number): string {
     return this.getPostEndpoint(id, 'include=content');
+  }
+  private getSideBarUrl(): string {
+    return `${this.API_ROOT}widgets/get_sidebar/?sidebar_id=${SIDE_BAR_NAME}`
   }
 }
