@@ -18,25 +18,15 @@ var config = {
     filename: '[name].bundle.js'
   },
   module: {
-    loaders: [{
-      test: /\.ts$/,
-      loader: 'ts',
-      exclude: [
-          /node_modules/
-      ]
-    }, {
-      test: /\.json$/,
-      loader: "json"
-    }, {
-      test: /\.html$/,
-      loader: 'raw'
-    }, {
-      test: /\.scss$/,
-      loader: "raw!postcss!sass"
-    }],
-    postcss: function() { return [autoprefixer({browsers:['last 2 versions']})]; },
+    loaders: [
+      {test: /\.ts$/, loader: 'ts', exclude: [/node_modules/]},
+      {test: /\.json$/, loader: "json"},
+      {test: /\.html$/, loader: 'raw'},
+      {test: /\.scss$/, loader: "raw!postcss!sass"}
+    ],
     noParse: [/angular2\/bundles\/.+/],
   },
+  postcss: function() { return [autoprefixer({browsers:['last 2 versions']})]; },
   resolve: {
     extensions: ['', '.ts', '.js', '.html', '.scss']
   },
