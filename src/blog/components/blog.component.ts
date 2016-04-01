@@ -11,6 +11,7 @@ import {FetchingComponent} from '../../shared/fetching/fetching.component';
 import {BlogActionCreators} from '../blog.action.creators';
 import {BlogPostComponent} from './blog-post.component';
 import {BlogPostListComponent} from './blog-post-list.component';
+import {RecentPostsComponent} from './recent-posts.component';
 import {
   IBlogStore,
   IBlogSummary,
@@ -23,7 +24,13 @@ import {
   selector: 'blog',
   template: require('./blog.component.html'),
   styles: [require('./blog.component.scss')],
-  directives: [PagerComponent, FetchingComponent, BlogPostListComponent, BlogPostComponent, ROUTER_DIRECTIVES],
+  directives: [
+    PagerComponent,
+    FetchingComponent,
+    BlogPostListComponent,
+    BlogPostComponent,
+    RecentPostsComponent,
+    ROUTER_DIRECTIVES],
   providers: [BlogActionCreators],
 })
 export class BlogComponent implements OnInit {
@@ -36,6 +43,7 @@ export class BlogComponent implements OnInit {
   currentPage: number;
   
   posts: IBlogPost[];
+  recentPosts: IBlogPost[];
   post: IBlogPost;
   
   constructor(
@@ -63,6 +71,10 @@ export class BlogComponent implements OnInit {
       .filter(store => !store.needSummaries)
       .map(store => store.postMap);
 
+    postMap$
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
+      .subscribe(posts => this.recentPosts = posts.slice(0, 5));
+
     if(slug === null) {
       let skip = this.currentPage * this.postsPerPage - this.postsPerPage;
       postMap$
@@ -81,6 +93,7 @@ export class BlogComponent implements OnInit {
     }
 
   }
+  
   
   isFirstPage(): boolean {
     return this.currentPage === 1;
