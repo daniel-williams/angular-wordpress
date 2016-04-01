@@ -1,0 +1,6 @@
+<div class='tag-cloud'>
+  <h3>Tags</h3>
+  <ul class='tags'>
+    <li *ngFor='#tag of tags'><a [routerLink]="['BlogTag', {tag:tag.slug}]">{{tag.title}}</a></li>
+  </ul>
+</div>

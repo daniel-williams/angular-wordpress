@@ -8,6 +8,7 @@ import {
   IBlogSummary,
   IBlogBody,
   IBlogPost,
+  ITag,
 } from './models';
 import {BLOG_URL} from './blog.config';
 import * as actions from './blog.action';
@@ -25,13 +26,22 @@ export class BlogService {
   public fetchSummaries(): Observable<IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,
-      url: this.getSummariesUrl()})
+      url: this.getSummariesUrl()
+    });
   }
   
   public fetchBody(id: number): Observable<IBlogBody> {
     return this.request({
       method: RequestMethod.Get,
-      url: this.getBodyUrl(id)})
+      url: this.getBodyUrl(id)
+    });
+  }
+  
+  public fetchTags(): Observable<ITag> {
+    return this.request({
+      method: RequestMethod.Get,
+      url: this.getTags()
+    });
   }
   
   
@@ -63,5 +73,8 @@ export class BlogService {
   }
   private getBodyUrl(id: number): string {
     return this.getPostEndpoint(id, 'include=content');
+  }
+  private getTags(): string {
+    return `${this.API_ROOT}get_tag_index/`;
   }
 }

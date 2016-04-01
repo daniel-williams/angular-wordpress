@@ -29,14 +29,19 @@ import {BlogComponent, BlogService} from './blog';
         component: AboutComponent
     },
     {
-        path: '/blog',
-        name: 'Blog',
-        component: BlogComponent
+      path: '/blog/tag/:tag',
+      name: 'BlogTag',
+      component: BlogComponent
     },
     {
       path: '/blog/:slug',
       name: 'BlogPost',
       component: BlogComponent
+    },
+    {
+        path: '/blog',
+        name: 'Blog',
+        component: BlogComponent
     }
 ])
 export class AppComponent {

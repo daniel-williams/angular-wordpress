@@ -15,7 +15,9 @@ const initialState: IBlogStore = {
     currentPage: 1,
 
     needSummaries: true,
+    needTags: true,
     postMap: {},
+    tags: [],
 };
 
 export const BlogReducer: Reducer<IBlogStore> = (state: IBlogStore = initialState, action: Action) => {
@@ -43,6 +45,14 @@ export const BlogReducer: Reducer<IBlogStore> = (state: IBlogStore = initialStat
           [payload.slug]: Object.assign({}, state.postMap[payload.slug], payload.body, {needBody: false, isUpdating: false}),
         }),
       });
+    }
+    case actions.FETCHING_TAGS: {
+      return Object.assign({}, state, {
+        isUpdating: true
+      });
+    }
+    case actions.FETCHED_TAGS: {
+      return Object.assign({}, state, payload, {isUpdating: false, needTags: false});
     }
 
     case actions.BLOG_PAGE_NEXT: {

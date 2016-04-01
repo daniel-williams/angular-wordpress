@@ -45,13 +45,28 @@ export class BlogActionCreators {
           type: actions.FETCHED_BODY,
           payload: {
             slug: action.payload.slug,
-            body: this.toBody(json),
+            body: this.toBodyPayload(json),
           }
         })
       );
 
+    let fetchTags = this.actions$
+      .filter(action => action.type === actions.FETCH_TAGS)
+      .do(action => appStore.dispatch({type: actions.FETCHING_TAGS}))
+      .mergeMap(
+        action => blogService.fetchTags(),
+        (action, json: any) => ({
+          type: actions.FETCHED_TAGS,
+          payload: {
+            tags: json.tags
+          }
+        })
+      );
+
+
+
     Observable
-      .merge(fetchSummaries, fetchBody)
+      .merge(fetchSummaries, fetchBody, fetchTags)
       .subscribe((action: Action) => appStore.dispatch(action));
   }
 
@@ -70,6 +85,12 @@ export class BlogActionCreators {
           slug: post.slug
         }
       });
+    }
+  }
+  
+  loadTags() {
+    if(this.appStore.value.blog.needTags) {
+      this.actions$.next({type: actions.FETCH_TAGS})
     }
   }
   
@@ -96,7 +117,7 @@ export class BlogActionCreators {
       postMap,
     } 
   }
-  private toBody(json) {
+  private toBodyPayload(json) {
     let post = json.post;
     return {
       id: post.id,

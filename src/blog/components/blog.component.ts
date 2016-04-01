@@ -11,12 +11,14 @@ import {FetchingComponent} from '../../shared/fetching/fetching.component';
 import {BlogActionCreators} from '../blog.action.creators';
 import {BlogPostComponent} from './blog-post.component';
 import {BlogPostListComponent} from './blog-post-list.component';
-import {RecentPostsComponent} from './recent-posts.component';
+import {RecentPostsComponent} from './widgets/recent-posts.component';
+import {TagCloudComponent} from './widgets/tag-cloud.component';
 import {
   IBlogStore,
   IBlogSummary,
   IBlogBody,
   IBlogPost,
+  ITag,
 } from '../models';
 
 
@@ -30,6 +32,7 @@ import {
     BlogPostListComponent,
     BlogPostComponent,
     RecentPostsComponent,
+    TagCloudComponent,
     ROUTER_DIRECTIVES],
   providers: [BlogActionCreators],
 })
@@ -45,6 +48,8 @@ export class BlogComponent implements OnInit {
   posts: IBlogPost[];
   recentPosts: IBlogPost[];
   post: IBlogPost;
+  
+  tags: ITag[];
   
   constructor(
     private appStore: Store<IAppStore>,
@@ -66,6 +71,7 @@ export class BlogComponent implements OnInit {
       });
 
     this.actions.loadSummaries();
+    this.actions.loadTags();
 
     var postMap$ = this.store$
       .filter(store => !store.needSummaries)
@@ -75,6 +81,12 @@ export class BlogComponent implements OnInit {
       .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
       .subscribe(posts => this.recentPosts = posts.slice(0, 5));
 
+    var tag$ = this.store$
+      .filter(store => !store.needTags)
+      .map(store => store.tags)
+      .subscribe(tags => this.tags = tags);
+
+    // determine if we need a specific post or a list of posts
     if(slug === null) {
       let skip = this.currentPage * this.postsPerPage - this.postsPerPage;
       postMap$

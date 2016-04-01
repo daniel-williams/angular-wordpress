@@ -1,8 +1,9 @@
 <div class='blog'>
   <div><h1>Blog</h1></div>
   <div class='row'>
-    <div class='col-sm-4'>
+    <div class='col-sm-4 hidden-xs'>
       <recent-posts *ngIf='recentPosts' [posts]='recentPosts'></recent-posts>
+      <tag-cloud *ngIf='tags' [tags]='tags'></tag-cloud>
     </div>
     <div class='col-sm-8'>
       <blog-post *ngIf='post' [post]='post'></blog-post>
