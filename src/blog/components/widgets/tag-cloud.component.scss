@@ -4,17 +4,15 @@
     padding: 0;
     
     li {
-
+      display: inline;
+      margin-right: 5px;
+      
       a {
-        display: block;
-        padding: 5px;
-        border: 1px solid transparent;
-        transition: border .3s;
-        
-        &:hover {
-          border: 1px solid #ff9e1b;
-          border-radius: 4px;
-        }
+        padding: 5px 0 5px;
+        line-height: 20px;
+      }
+      a:hover {
+        text-decoration: underline;
       }
     }
   }

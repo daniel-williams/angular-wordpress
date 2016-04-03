@@ -58,7 +58,7 @@ export class BlogActionCreators {
         (action, json: any) => ({
           type: actions.FETCHED_TAGS,
           payload: {
-            tags: json.tags
+            tags: this.toTagPayload(json.tags)
           }
         })
       );
@@ -123,5 +123,14 @@ export class BlogActionCreators {
       id: post.id,
       body: post.content,
     }
+  }
+  private toTagPayload(tags) {
+    return tags.map(tag => ({
+      id: tag.id,
+      title: tag.title,
+      slug: tag.slug,
+      description: tag.description,
+      count: tag.post_count,
+    }));
   }
 }

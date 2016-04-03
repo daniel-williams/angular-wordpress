@@ -56,12 +56,20 @@ export class BlogComponent implements OnInit {
     private router: Router,
     private routeParams: RouteParams,
     private actions: BlogActionCreators) {
+    this.store$ = this.appStore.select(appStore => appStore.blog);
+    
+    var tag$ = this.store$
+      .filter(store => !store.needTags)
+      .map(store => store.tags)
+      .subscribe(tags => {
+        // console.log('assigning tags', tags);
+        this.tags = tags;
+      });
   }
 
   ngOnInit() {
     const slug: string = this.routeParams.get('slug');
     this.currentPage = +(this.routeParams.get('page') || 1);
-    this.store$ = this.appStore.select(appStore => appStore.blog);
 
     this.store$
       .subscribe(store => {
@@ -81,10 +89,7 @@ export class BlogComponent implements OnInit {
       .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
       .subscribe(posts => this.recentPosts = posts.slice(0, 5));
 
-    var tag$ = this.store$
-      .filter(store => !store.needTags)
-      .map(store => store.tags)
-      .subscribe(tags => this.tags = tags);
+
 
     // determine if we need a specific post or a list of posts
     if(slug === null) {
