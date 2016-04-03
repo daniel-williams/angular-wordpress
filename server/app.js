@@ -1,5 +1,6 @@
 import path from 'path';
 import express from 'express';
+import favicon from 'serve-favicon';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -26,6 +27,9 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 app.use(webpackHotMiddleware(compiler));
 
+// app.use('/favicon.ico', express.static('client/content/images/favicon.ico'));
+app.use(favicon(path.resolve(__dirname + './../client/content/images/favicon.ico')));
+
 app.use('/content', express.static('client/content'));
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -47,14 +51,14 @@ function renderPage() {
 <html>
   <head>
     <title>Blog</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
   </head>
   <body>
     
     <my-app></my-app>
     
-    <script src="/content/bundles/vendors.bundle.js"></script>
-    <script src="/content/bundles/app.bundle.js"></script>
+    <script src='/content/bundles/vendors.bundle.js'></script>
+    <script src='/content/bundles/app.bundle.js'></script>
   </body>
 </html>
 `
