@@ -5,14 +5,7 @@ import {distinct} from 'rxjs/operator/distinct';
 import {Store} from '@ngrx/store';
 
 import {IAppStore} from '../../store';
-import {PagerComponent} from '../../shared/pager/pager.component';
-import {FetchingComponent} from '../../shared/fetching/fetching.component';
-
-import {BlogActionCreators} from '../blog.action.creators';
-import {BlogPostComponent} from './blog-post.component';
-import {BlogPostListComponent} from './blog-post-list.component';
-import {RecentPostsComponent} from './widgets/recent-posts.component';
-import {TagCloudComponent} from './widgets/tag-cloud.component';
+import {BlogService} from '../blog.service';
 import {
   IBlogStore,
   IBlogSummary,
@@ -20,6 +13,14 @@ import {
   IBlogPost,
   ITag,
 } from '../models';
+
+import {BlogPostComponent} from './blog-post.component';
+import {BlogPostListComponent} from './blog-post-list.component';
+import {RecentPostsComponent} from './widgets/recent-posts.component';
+import {TagCloudComponent} from './widgets/tag-cloud.component';
+
+import {PagerComponent} from '../../shared/pager/pager.component';
+import {FetchingComponent} from '../../shared/fetching/fetching.component';
 
 
 @Component({
@@ -34,7 +35,7 @@ import {
     RecentPostsComponent,
     TagCloudComponent,
     ROUTER_DIRECTIVES],
-  providers: [BlogActionCreators],
+  providers: [BlogService],
 })
 export class BlogComponent implements OnInit {
   store$: Observable<IBlogStore>;
@@ -55,7 +56,7 @@ export class BlogComponent implements OnInit {
     private appStore: Store<IAppStore>,
     private router: Router,
     private routeParams: RouteParams,
-    private actions: BlogActionCreators) {
+    private blogService: BlogService) {
     this.store$ = this.appStore.select(appStore => appStore.blog);
     
     var tag$ = this.store$
@@ -78,8 +79,8 @@ export class BlogComponent implements OnInit {
         this.pageCount = store.pageCount;
       });
 
-    this.actions.loadSummaries();
-    this.actions.loadTags();
+    this.blogService.loadSummaries();
+    this.blogService.loadTags();
 
     var postMap$ = this.store$
       .filter(store => !store.needSummaries)
@@ -106,7 +107,7 @@ export class BlogComponent implements OnInit {
 
       post$
         .filter(post => post.needBody && !post.isUpdating)
-        .subscribe(post => this.actions.loadBody(post));
+        .subscribe(post => this.blogService.loadBody(post));
     }
 
   }
