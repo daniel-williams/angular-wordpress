@@ -6,7 +6,7 @@ import {STORE_PROVIDERS} from './store';
 
 import {HomeComponent} from './home';
 import {AboutComponent} from './about';
-import {BlogComponent, BlogService} from './blog';
+import {BlogContainer} from './blog/blog.container';
 
 
 @Component({
@@ -14,7 +14,7 @@ import {BlogComponent, BlogService} from './blog';
     template: require('./app.component.html'),
     styles: [require('./app.component.scss')],
     directives: [ROUTER_DIRECTIVES],
-    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS, BlogService],
+    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS],
     encapsulation: ViewEncapsulation.None,
 })
 @RouteConfig([
@@ -29,20 +29,29 @@ import {BlogComponent, BlogService} from './blog';
         component: AboutComponent
     },
     {
-      path: '/blog/tag/:tag',
-      name: 'BlogTag',
-      component: BlogComponent
+      path: '/blog/...',
+      name: 'Blog',
+      component: BlogContainer
     },
     {
-      path: '/blog/:slug',
-      name: 'BlogPost',
-      component: BlogComponent
+      path: '/**',
+      redirectTo: ['Home']
     },
-    {
-        path: '/blog',
-        name: 'Blog',
-        component: BlogComponent
-    }
+    // {
+    //   path: '/blog/tag/:tag',
+    //   name: 'BlogTag',
+    //   component: BlogComponent
+    // },
+    // {
+    //   path: '/blog/:slug',
+    //   name: 'BlogPost',
+    //   component: BlogComponent
+    // },
+    // {
+    //     path: '/blog',
+    //     name: 'Blog',
+    //     component: BlogComponent
+    // }
 ])
 export class AppComponent {
 }
