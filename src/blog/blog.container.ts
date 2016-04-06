@@ -79,7 +79,7 @@ export class BlogContainer implements AfterViewChecked, OnInit {
       .map(store => store.postMap);
     
     this.postMap$
-      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]).slice(0,5))
       .subscribe(posts => this.recentPosts = posts);
   }
 
@@ -93,10 +93,10 @@ export class BlogContainer implements AfterViewChecked, OnInit {
     if(nextView !== this.currentView) {
       this.currentView = nextView;
       
-      switch(this.currentView) {
-        case(POST_LIST): {
-          let t = setTimeout(() => {
-            
+      // setTimeout avoids #6005 (https://github.com/angular/angular/issues/6005)
+      setTimeout(() => {
+        switch(this.currentView) {
+          case(POST_LIST): {
             this.postMap$
               .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
               .subscribe(posts => {
@@ -104,24 +104,19 @@ export class BlogContainer implements AfterViewChecked, OnInit {
                   this.blogPostList.posts = posts;
                 }
               });
-              
-          }, 0); // setTimeout avoids #6005 (https://github.com/angular/angular/issues/6005)
-          break;
-        }
-        case(POST_DETAIL): {
-          let t = setTimeout(() => {
-            
+            break;
+          }
+          case(POST_DETAIL): {
             let slug = this.blogPostDetail.slug;
             this.postMap$
               .map(postMap => postMap[slug])
               .do(post => this.blogPostDetail.post = post)
               .filter(post => post.needBody && !post.isUpdating)
               .subscribe(post => this.blogService.loadBody(post));
-              
-          }, 0); // setTimeout avoids #6005 (https://github.com/angular/angular/issues/6005)
-          break;
+            break;
+          }
         }
-      }
+      }, 0); // end setTimeout
     }
   }
 }
