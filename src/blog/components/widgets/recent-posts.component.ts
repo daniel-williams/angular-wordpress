@@ -12,7 +12,4 @@ import {IBlogPost} from '../../models';
 })
 export class RecentPostsComponent {
   @Input() posts: IBlogPost[];
-  
-  constructor() { }
-
 }
