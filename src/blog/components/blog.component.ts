@@ -19,8 +19,8 @@ import {BlogPostListComponent} from './blog-post-list.component';
 import {RecentPostsComponent} from './widgets/recent-posts.component';
 import {TagCloudComponent} from './widgets/tag-cloud.component';
 
-import {PagerComponent} from '../../shared/pager/pager.component';
-import {FetchingComponent} from '../../shared/fetching/fetching.component';
+import {PagerComponent} from '../../shared/components/pager/pager.component';
+import {FetchingComponent} from '../../shared/components/fetching/fetching.component';
 
 
 @Component({
