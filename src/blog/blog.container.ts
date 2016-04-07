@@ -1,8 +1,9 @@
-import {Component, OnInit} from 'angular2/core';
+import {Component, OnInit, provide} from 'angular2/core';
 import {CanReuse, RouteData, RouteParams, ROUTER_DIRECTIVES} from 'angular2/router';
 import {Observable} from 'rxjs';
 
 import {Store} from '@ngrx/store';
+import {BLOG_CONFIG, BlogConfig} from './blog.config';
 import {BlogService} from './blog.service';
 import {IAppStore} from '../store';
 import {IBlogStore, IBlogPost} from './models';
@@ -14,7 +15,7 @@ import {RecentPostsComponent} from './components/widgets/recent-posts.component'
 
 @Component({
   selector: 'blog-container',
-  providers: [BlogService],
+  providers: [provide(BLOG_CONFIG, {useValue: BlogConfig}), BlogService],
   directives: [BlogPostListComponent, BlogPostDetailComponent, RecentPostsComponent, ROUTER_DIRECTIVES],
   template: `
   <div class='container'>

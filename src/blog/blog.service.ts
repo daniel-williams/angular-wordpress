@@ -1,30 +1,27 @@
-import {Injectable} from 'angular2/core';
+import {Inject, Injectable} from 'angular2/core';
 import {Headers, Http, Request, RequestMethod, Response} from 'angular2/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
+import {BLOG_CONFIG, IBlogConfig} from './blog.config';
 import {IAppStore} from '../store';
-import {
-  IBlogSummary,
-  IBlogBody,
-  IBlogPost,
-  ITag,
-} from './models';
+import * as models from './models';
 import * as actions from './blog.action';
-import {BLOG_URL} from './blog.config';
 
 
 @Injectable()
 export class BlogService {
   
-  private API_ROOT: string = `http://${BLOG_URL}/api/`;
+  private API_ROOT: string;
   private dispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
   
   constructor(
     private http: Http,
-    private appStore: Store<IAppStore>
+    private appStore: Store<IAppStore>,
+    @Inject(BLOG_CONFIG) blogConfig: IBlogConfig
   ) {
-
+    this.API_ROOT = `http://${blogConfig.url}/api/`;
+    
     const summariesDispatcher = this.dispatch$
       .filter(action => action.type === actions.FETCH_SUMMARIES)
       .do(() => appStore.dispatch({type: actions.FETCHING_SUMMARIES}))
@@ -80,7 +77,7 @@ export class BlogService {
       this.dispatch$.next({type: actions.FETCH_SUMMARIES});
     }
   }
-  loadBody(post: IBlogPost) {
+  loadBody(post: models.IBlogPost) {
     if(post && post.needBody) {
       this.dispatch$.next({
         type: actions.FETCH_BODY,
@@ -98,21 +95,21 @@ export class BlogService {
   }
   
   
-  private fetchSummaries(): Observable<IBlogSummary[]> {
+  private fetchSummaries(): Observable<models.IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,
       url: this.getSummariesUrl()
     });
   }
   
-  private fetchBody(id: number): Observable<IBlogBody> {
+  private fetchBody(id: number): Observable<models.IBlogBody> {
     return this.request({
       method: RequestMethod.Get,
       url: this.getBodyUrl(id)
     });
   }
   
-  private fetchTags(): Observable<ITag> {
+  private fetchTags(): Observable<models.ITag> {
     return this.request({
       method: RequestMethod.Get,
       url: this.getTags()
