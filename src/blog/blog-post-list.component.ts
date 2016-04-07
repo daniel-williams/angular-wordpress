@@ -6,6 +6,7 @@ import {FetchingComponent} from '../shared/components';
 
 
 @Component({
+  selector: 'blog-post-list',
   directives: [FetchingComponent, ROUTER_DIRECTIVES],
   template: `
   <div class='row'>
@@ -23,4 +24,7 @@ import {FetchingComponent} from '../shared/components';
 
 export class BlogPostListComponent {
   @Input() posts: IBlogPost[];
+  constuctor() {
+    console.log('try harder!');
+  }
 }

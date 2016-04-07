@@ -6,7 +6,7 @@ import {STORE_PROVIDERS} from './store';
 
 import {HomeComponent} from './home';
 import {AboutComponent} from './about';
-import {BlogContainer} from './blog/blog.container';
+import {BlogRouter} from './blog/blog.router';
 
 
 @Component({
@@ -31,7 +31,7 @@ import {BlogContainer} from './blog/blog.container';
     {
       path: '/blog/...',
       name: 'Blog',
-      component: BlogContainer
+      component: BlogRouter
     },
     {
       path: '/**',

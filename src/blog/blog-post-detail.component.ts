@@ -1,10 +1,11 @@
 import {Component, Input} from 'angular2/core';
-import {RouteParams, ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {IBlogPost} from './models';
 import {FetchingComponent} from '../shared/components';
 
 @Component({
+  selector: 'blog-post-detail',
   template: `
   <div class='row'>
     <div class='col-xs-12'>
@@ -26,10 +27,5 @@ import {FetchingComponent} from '../shared/components';
 })
 
 export class BlogPostDetailComponent {
-  post: IBlogPost;
-  slug: string;
-  
-  constructor(private routeParams: RouteParams) {
-    this.slug = this.routeParams.get('slug');
-  }
+  @Input() post: IBlogPost;
 }
