@@ -1,5 +1,7 @@
 # angular2-wordpress
-Simple Angular 2 app, running against the worlds okeyest blog CMS, Wordpress. Currently using the JSON API plugin.
+Angular 2 running against the worlds okeyest blog CMS, Wordpress. Currently using the JSON API plugin.
 
 ### Motivations
-I've always liked the Wordpress dashboard, but mostly hate working with community themes/plugins. The never-ending series of compromises displeases me greatly. Of course I could edit the theme/plugin or write my own, but that brings me to the real crux of the matter: everytime I'm forced to work with PHP, I feel... diminished. What if I could use Angular or React on the front-end?
+For the most part, I'm still doing a deep dive on angular 2 framework patterns against a blog backend--one of my common use cases. Currently working through component composition strategies.
+
+
