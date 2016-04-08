@@ -1,6 +1,7 @@
-import {Component, Input} from 'angular2/core';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {Component, OnInit} from 'angular2/core';
+import {RouteParams, ROUTER_DIRECTIVES} from 'angular2/router';
 
+import {BlogService} from './blog.service';
 import {IBlogPost} from './models';
 import {FetchingComponent} from '../shared/components';
 
@@ -26,6 +27,18 @@ import {FetchingComponent} from '../shared/components';
   directives: [ROUTER_DIRECTIVES]
 })
 
-export class BlogPostDetailComponent {
-  @Input() post: IBlogPost;
+export class BlogPostDetailComponent implements OnInit {
+  slug: string;
+  post: IBlogPost;
+  
+  constructor(private routeParams: RouteParams, private blogService: BlogService) {
+    this.slug = routeParams.get('slug');
+  }
+  
+  ngOnInit() {
+    this.blogService.getPost(this.slug).then(
+      post => this.post = post,
+      err => console.log(err)
+    );
+  }
 }

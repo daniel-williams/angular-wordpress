@@ -1,6 +1,7 @@
-import {Component, Input} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
+import {BlogService} from './blog.service';
 import {IBlogPost} from './models';
 import {FetchingComponent} from '../shared/components';
 
@@ -21,10 +22,16 @@ import {FetchingComponent} from '../shared/components';
     </div>
   `,
 })
-
-export class BlogPostListComponent {
-  @Input() posts: IBlogPost[];
-  constuctor() {
-    console.log('try harder!');
+export class BlogPostListComponent implements OnInit {
+  posts: IBlogPost[];
+  
+  constructor(private blogService: BlogService) {
+  }
+  
+  ngOnInit() {
+    this.blogService.getPosts().then(
+      posts => this.posts = posts,
+      err => console.log(err)
+    );
   }
 }

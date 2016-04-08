@@ -7,7 +7,7 @@ export interface IBlogConfig {
   url: string,
 }
 
-export const BlogConfig = {
+export const BlogConfig: IBlogConfig = {
   url:'blog.skyberrystudio.com'
 }
 

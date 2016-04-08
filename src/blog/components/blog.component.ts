@@ -80,7 +80,7 @@ export class BlogComponent implements OnInit {
       });
 
     this.blogService.loadSummaries();
-    this.blogService.loadTags();
+    // this.blogService.loadTags();
 
     var postMap$ = this.store$
       .filter(store => !store.needSummaries)

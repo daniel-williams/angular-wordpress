@@ -1,6 +1,7 @@
-import {Component, Input, OnInit} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
+import {BlogService} from '../../blog.service';
 import {IBlogPost} from '../../models';
 
 
@@ -10,6 +11,15 @@ import {IBlogPost} from '../../models';
   styles: [require('./recent-posts.component.scss')],
   directives: [ROUTER_DIRECTIVES],
 })
-export class RecentPostsComponent {
-  @Input() posts: IBlogPost[];
+export class RecentPostsComponent implements OnInit {
+  posts: IBlogPost[];
+  
+  constructor(private blogService: BlogService) {}
+  
+  ngOnInit() {
+    this.blogService.getRecentPosts().then(
+      posts => this.posts = posts,
+      err => console.log(err)
+    );
+  }
 }

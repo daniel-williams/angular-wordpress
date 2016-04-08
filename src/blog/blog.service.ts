@@ -14,6 +14,8 @@ export class BlogService {
   
   private API_ROOT: string;
   private dispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
+  private store$: Observable<models.IBlogStore>;
+  private postMap$: Observable<any>;
   
   constructor(
     private http: Http,
@@ -52,32 +54,52 @@ export class BlogService {
         })
       );
 
-    const tagsDispatcher = this.dispatch$
-      .filter(action => action.type === actions.FETCH_TAGS)
-      .do(action => appStore.dispatch({type: actions.FETCHING_TAGS}))
-      .mergeMap(
-        action => this.fetchTags(),
-        (action, json: any) => ({
-          type: actions.FETCHED_TAGS,
-          payload: {
-            tags: this.toTagPayload(json.tags)
-          }
-        })
-      );
-
     Observable
-      .merge(summariesDispatcher, bodyDispatcher, tagsDispatcher)
+      .merge(summariesDispatcher, bodyDispatcher)
       .subscribe((action: Action) => appStore.dispatch(action));
+
+    this.store$ = this.appStore.select(appStore => appStore.blog);
+    this.postMap$ = this.store$
+      .filter(store => !store.needSummaries)
+      .map(store => store.postMap);
   }
 
 
   // public 
-  loadSummaries() {
+  loadSummaries(): void {
     if(this.appStore.value.blog.needSummaries) {
       this.dispatch$.next({type: actions.FETCH_SUMMARIES});
     }
   }
-  loadBody(post: models.IBlogPost) {
+  
+  getPosts(): Promise<models.IBlogPost[]> {
+    return this.postMap$
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
+      .take(1)
+      .toPromise();
+  }
+
+  getRecentPosts(): Promise<models.IBlogPost[]> {
+    return this.postMap$
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]).slice(0,5))
+      .take(1)
+      .toPromise();
+  }
+
+  getPost(slug: string): Promise<models.IBlogPost> {
+    let post$ = this.postMap$
+      .map(postMap => postMap[slug]);
+    
+    post$
+      .filter(post => post.needBody && !post.isUpdating)
+      .subscribe(post => this.loadBody(post));
+    
+    return post$.filter(post => !post.needBody).take(1).toPromise();
+  }
+  
+  
+  // private helpers
+  loadBody(post: models.IBlogPost): void {
     if(post && post.needBody) {
       this.dispatch$.next({
         type: actions.FETCH_BODY,
@@ -88,13 +110,6 @@ export class BlogService {
       });
     }
   }
-  loadTags() {
-    if(this.appStore.value.blog.needTags) {
-      this.dispatch$.next({type: actions.FETCH_TAGS})
-    }
-  }
-  
-  
   private fetchSummaries(): Observable<models.IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,
@@ -109,15 +124,6 @@ export class BlogService {
     });
   }
   
-  private fetchTags(): Observable<models.ITag> {
-    return this.request({
-      method: RequestMethod.Get,
-      url: this.getTags()
-    });
-  }
-  
-  
-  // private helpers
   private request(options: any): Observable<any> {
     if (options.body) {
       if (typeof options.body !== 'string') {
@@ -146,9 +152,7 @@ export class BlogService {
   private getBodyUrl(id: number): string {
     return this.getPostEndpoint(id, 'include=content');
   }
-  private getTags(): string {
-    return `${this.API_ROOT}get_tag_index/`;
-  }
+
   
   private toSummariesPayload(json) {
     let postMap = json.posts.reduce((accum, item) => {
@@ -179,13 +183,5 @@ export class BlogService {
       body: post.content,
     }
   }
-  private toTagPayload(tags) {
-    return tags.map(tag => ({
-      id: tag.id,
-      title: tag.title,
-      slug: tag.slug,
-      description: tag.description,
-      count: tag.post_count,
-    }));
-  }
+  
 }
