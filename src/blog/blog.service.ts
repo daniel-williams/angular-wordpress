@@ -1,4 +1,5 @@
 import {Inject, Injectable} from 'angular2/core';
+import {Router} from 'angular2/router';
 import {Headers, Http, Request, RequestMethod} from 'angular2/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
@@ -8,7 +9,7 @@ import {BlogResponseMapper} from './blog.response-mapper';
 import {BLOG_CONFIG, IBlogConfig} from './blog.config';
 import {IAppStore} from '../store';
 import * as models from './models';
-import * as actions from './blog.action';
+import * as actions from './blog.actions';
 
 
 @Injectable()
@@ -16,15 +17,20 @@ export class BlogService extends FetchService {
   
   private API_ROOT: string;
   private blogStore$: Observable<models.IBlogStore>;
-  private actionDispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
   private postMap$: Observable<any>;
   
+  private actionDispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
+  
+  postsPerPage: number;
+  pageCount: number;
+  currentPage: number = 1;
+  
   constructor(
-    http: Http,
+    protected http: Http,
+    private router: Router,
     private appStore: Store<IAppStore>,
     private mapper: BlogResponseMapper,
-    @Inject(BLOG_CONFIG)
-    private blogConfig: IBlogConfig
+    @Inject(BLOG_CONFIG) private blogConfig: IBlogConfig
   ) {
     super(http);
     
@@ -32,7 +38,13 @@ export class BlogService extends FetchService {
 
     this.blogStore$ = this.appStore
       .select(appStore => appStore.blog);
-      
+
+    this.blogStore$
+      .subscribe(store => {
+        this.postsPerPage = store.postsPerPage;
+        this.pageCount = store.pageCount;
+      });
+
     this.postMap$ = this.blogStore$
       .filter(store => !store.needSummaries)
       .map(store => store.postMap);
@@ -84,10 +96,24 @@ export class BlogService extends FetchService {
       this.actionDispatch$.next({type: actions.FETCH_SUMMARIES});
     }
   }
+  loadBody(post: models.IBlogPost): void {
+    if(post && post.needBody) {
+      this.actionDispatch$.next({
+        type: actions.FETCH_BODY,
+        payload: {
+          id: post.id,
+          slug: post.slug
+        }
+      });
+    }
+  }
   
   getPosts(): Observable<models.IBlogPost[]> {
+    let start = this.currentPage * this.postsPerPage - this.postsPerPage;
+    let end = start + this.postsPerPage;
     return this.postMap$
-      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]));
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
+      .map(posts => posts.slice(start, end))
   }
 
   getRecentPosts(): Observable<models.IBlogPost[]> {
@@ -106,19 +132,36 @@ export class BlogService extends FetchService {
     return post$.filter(post => !post.needBody);
   }
   
+  isFirstPage(): boolean {
+    return this.currentPage === 1;
+  }
+  getPageStatus(): string {
+    return this.pageCount > 0
+      ? `${this.currentPage} of ${this.pageCount}`
+      : '';
+  }
+  isLastPage(): boolean {
+    return this.currentPage === this.pageCount || this.pageCount === 0;
+  }
   
-  // private helpers
-  loadBody(post: models.IBlogPost): void {
-    if(post && post.needBody) {
-      this.actionDispatch$.next({
-        type: actions.FETCH_BODY,
-        payload: {
-          id: post.id,
-          slug: post.slug
-        }
-      });
+  onNext(event) {
+    if(this.currentPage < this.pageCount) {
+      this.router.navigate(['BlogPostList', {page: this.currentPage + 1}]);
     }
   }
+  onPrevious(event) {
+    if(this.currentPage > 2) {
+      this.router.navigate(['BlogPostList', {page: this.currentPage - 1}]);
+    } else if(this.currentPage === 2) {
+      this.router.navigate(['BlogPostList']);
+    }
+  }
+  
+  setCurrentPage(page: number) {
+    this.currentPage = page;
+  }
+  
+  // private helpers
   private fetchSummaries(): Observable<models.IBlogSummary[]> {
     return this.request({
       method: RequestMethod.Get,

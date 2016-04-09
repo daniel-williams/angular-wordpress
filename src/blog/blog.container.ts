@@ -5,9 +5,8 @@ import {BlogService} from './blog.service';
 import {BLOG_CONFIG, BlogConfig} from './blog.config';
 import {BlogResponseMapper} from './blog.response-mapper';
 
-import {EmptyComponent} from './empty.component';
-import {BlogPostListComponent} from './blog-post-list.component';
-import {BlogPostDetailComponent} from './blog-post-detail.component';
+import {BlogPostListComponent} from './components/blog-post-list.component';
+import {BlogPostDetailComponent} from './components/blog-post-detail.component';
 import {RecentPostsComponent} from './components/widgets/recent-posts.component';
 
 
@@ -38,20 +37,12 @@ import {RecentPostsComponent} from './components/widgets/recent-posts.component'
     path: '/',
     name: 'BlogPostList',
     component: BlogPostListComponent,
-    // component: EmptyComponent,
-    data: {
-      mode: 'list'
-    },
     useAsDefault: true,
   },
   {
     path: '/:slug',
     name: 'BlogPostDetail',
     component: BlogPostDetailComponent,
-    // component: EmptyComponent,
-    data: {
-      mode: 'detail'
-    }
   },
   {
     path: '/**',
@@ -60,9 +51,7 @@ import {RecentPostsComponent} from './components/widgets/recent-posts.component'
 ])
 export class BlogContainer implements OnInit {
 
-  constructor(private blogService: BlogService){
-    console.log('container constructed');
-  }
+  constructor(private blogService: BlogService){}
 
   ngOnInit() {
     this.blogService.loadSummaries();

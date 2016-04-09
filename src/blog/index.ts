@@ -1,6 +1,6 @@
 
 export * from './components/blog.component';
-export * from './components/blog-post.component';
+export * from './components/blog-post-detail.component';
 export * from './components/blog-post-list.component';
 
 export * from './blog.service';

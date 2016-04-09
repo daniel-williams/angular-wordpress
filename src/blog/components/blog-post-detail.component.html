@@ -1,0 +1,12 @@
+<div class='options'>
+    <button
+    type='button'
+    class='btn btn-primary'
+    (click)='back()'>back</button>
+</div>
+<fetching *ngIf="!post"></fetching>
+<div *ngIf='post' class='blog-post'>
+  <h2>{{post.title}}</h2>
+  <fetching *ngIf="!post.body"></fetching>
+  <p *ngIf="post.body" [innerHTML]="post.body"></p>
+</div>

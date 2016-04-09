@@ -6,9 +6,7 @@ import {Observable} from 'rxjs';
 @Injectable()
 export class FetchService {
   
-  constructor(private http: Http) {
-    console.log('fetch constructed');
-  }
+  constructor(protected http: Http) {}
   
   protected request(options: any): Observable<any> {
     if (options.body) {

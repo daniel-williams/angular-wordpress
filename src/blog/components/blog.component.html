@@ -6,7 +6,7 @@
       <tag-cloud *ngIf='tags' [tags]='tags'></tag-cloud>
     </div>
     <div class='col-sm-8'>
-      <blog-post *ngIf='post' [post]='post'></blog-post>
+      <blog-post-detail *ngIf='post' [post]='post'></blog-post-detail>
       <pager
         *ngIf='!post'
         [isFirst]='isFirstPage()'

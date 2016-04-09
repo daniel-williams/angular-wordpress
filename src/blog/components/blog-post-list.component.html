@@ -1,7 +1,16 @@
+<div>
+  <pager
+    [isFirst]='blogService.isFirstPage()'
+    [isLast]='blogService.isLastPage()'
+    [status]='blogService.getPageStatus()'
+    (onPrevious)='blogService.onPrevious()'
+    (onNext)='blogService.onNext()'></pager>
+</div>
+
 <div class='blog-post-list'>
+  <fetching *ngIf="!posts || posts.length === 0"></fetching>
   <section *ngFor="#post of posts" class='blog-post'>
-    <h2><a [routerLink]="['BlogPost', {slug:post.slug}]">{{post.title}}</a></h2>
+    <h2><a [routerLink]="['BlogPostDetail', {slug:post.slug}]">{{post.title}}</a></h2>
     <p *ngIf="post.summary" [innerHTML]="post.summary"></p>
-    <p><fetching *ngIf="!post.summary"></fetching></p>
   </section>
 </div>

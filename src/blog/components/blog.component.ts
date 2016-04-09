@@ -14,7 +14,7 @@ import {
   ITag,
 } from '../models';
 
-import {BlogPostComponent} from './blog-post.component';
+import {BlogPostDetailComponent} from './blog-post-detail.component';
 import {BlogPostListComponent} from './blog-post-list.component';
 import {RecentPostsComponent} from './widgets/recent-posts.component';
 import {TagCloudComponent} from './widgets/tag-cloud.component';
@@ -31,7 +31,7 @@ import {FetchingComponent} from '../../shared/components/fetching/fetching.compo
     PagerComponent,
     FetchingComponent,
     BlogPostListComponent,
-    BlogPostComponent,
+    BlogPostDetailComponent,
     RecentPostsComponent,
     TagCloudComponent,
     ROUTER_DIRECTIVES],

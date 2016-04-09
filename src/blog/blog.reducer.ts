@@ -1,7 +1,7 @@
 import {Action, Reducer} from '@ngrx/store';
 
 import {IBlogStore} from './models';
-import * as actions from './blog.action';
+import * as actions from './blog.actions';
 
 
 const initialState: IBlogStore = {
