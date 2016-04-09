@@ -1,4 +1,4 @@
-<div class='recent-posts'>
+<div *ngIf='posts && posts.length > 0' class='recent-posts'>
   <h3>Recent Posts</h3>
   <ul>
     <li *ngFor="#post of posts"><a [routerLink]="['BlogPostDetail', {slug:post.slug}]">{{post.title}}</a></li>

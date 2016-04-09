@@ -1,8 +1,8 @@
-<div class='tag-cloud'>
+<div *ngIf='tagMeta && tagMeta.length > 0' class='tag-cloud'>
   <h3>Tags</h3>
   <ul class='tags'>
     <li *ngFor='#tag of tagMeta'>
-      <a [routerLink]="['BlogTag', {tag:tag.slug}]" [ngStyle]="tag.style">{{tag.title}}</a>,
+      <a [routerLink]="['BlogPostList', {tag:tag.slug}]" [ngStyle]="tag.style">{{tag.title}}</a>,
     </li>
   </ul>
 </div>

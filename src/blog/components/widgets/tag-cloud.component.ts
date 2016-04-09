@@ -1,7 +1,8 @@
-import {Component, ChangeDetectionStrategy, Input, OnInit} from 'angular2/core';
+import {Component, OnInit} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 import {Observable} from 'rxjs';
 
+import {TagService} from '../../tag.service';
 import {ITag} from '../../models';
 
 
@@ -10,16 +11,15 @@ import {ITag} from '../../models';
   template: require('./tag-cloud.component.html'),
   styles: [require('./tag-cloud.component.scss')],
   directives: [ROUTER_DIRECTIVES],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagCloudComponent implements OnInit {
-  @Input() tags: ITag[];
   private tagMeta: Array<any>;
   
-  constructor() {}
+  constructor(private tagService: TagService) {}
 
   ngOnInit() {
-    this.tagMeta = makeWordCloud(this.tags);
+    this.tagService.getTags()
+      .subscribe(tags => this.tagMeta = makeWordCloud(tags))
   }
 }
 
