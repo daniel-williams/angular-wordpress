@@ -2,6 +2,7 @@ import {Component, ViewEncapsulation} from 'angular2/core';
 import {HTTP_PROVIDERS} from 'angular2/http';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 
+import {FetchService} from './fetch.service';
 import {STORE_PROVIDERS} from './store';
 
 import {HomeComponent} from './home';
@@ -14,7 +15,7 @@ import {BlogContainer} from './blog/blog.container';
     template: require('./app.component.html'),
     styles: [require('./app.component.scss')],
     directives: [ROUTER_DIRECTIVES],
-    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS],
+    providers: [HTTP_PROVIDERS, ...STORE_PROVIDERS, FetchService],
     encapsulation: ViewEncapsulation.None,
 })
 @RouteConfig([

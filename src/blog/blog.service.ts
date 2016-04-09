@@ -1,8 +1,10 @@
 import {Inject, Injectable} from 'angular2/core';
-import {Headers, Http, Request, RequestMethod, Response} from 'angular2/http';
+import {Headers, Http, Request, RequestMethod} from 'angular2/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
+import {FetchService} from '../fetch.service';
+import {BlogResponseMapper} from './blog.response-mapper';
 import {BLOG_CONFIG, IBlogConfig} from './blog.config';
 import {IAppStore} from '../store';
 import * as models from './models';
@@ -10,34 +12,48 @@ import * as actions from './blog.action';
 
 
 @Injectable()
-export class BlogService {
+export class BlogService extends FetchService {
   
   private API_ROOT: string;
-  private dispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
-  private store$: Observable<models.IBlogStore>;
+  private blogStore$: Observable<models.IBlogStore>;
+  private actionDispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
   private postMap$: Observable<any>;
   
   constructor(
-    private http: Http,
+    http: Http,
     private appStore: Store<IAppStore>,
-    @Inject(BLOG_CONFIG) blogConfig: IBlogConfig
+    private mapper: BlogResponseMapper,
+    @Inject(BLOG_CONFIG)
+    private blogConfig: IBlogConfig
   ) {
-    this.API_ROOT = `http://${blogConfig.url}/api/`;
+    super(http);
     
-    const summariesDispatcher = this.dispatch$
+    this.API_ROOT = `http://${blogConfig.url}/api/`;
+
+    this.subscribeToActions();
+    
+    this.blogStore$ = this.appStore.select(appStore => appStore.blog);
+    this.postMap$ = this.blogStore$
+      .filter(store => !store.needSummaries)
+      .map(store => store.postMap);
+  }
+  
+  private subscribeToActions() {
+    
+    let fetchSummaries$ = this.actionDispatch$
       .filter(action => action.type === actions.FETCH_SUMMARIES)
-      .do(() => appStore.dispatch({type: actions.FETCHING_SUMMARIES}))
+      .do(() => this.appStore.dispatch({type: actions.FETCHING_SUMMARIES}))
       .mergeMap(
         action => this.fetchSummaries(),
-        (action, json: any) => ({
+        (action, json) => ({
           type: actions.FETCHED_SUMMARIES,
-          payload: this.toSummariesPayload(json),
+          payload: this.mapper.ResponseToPostMap(json),
         })
       )
 
-    const bodyDispatcher = this.dispatch$
+    let fetchBody$ = this.actionDispatch$
       .filter(action => action.type === actions.FETCH_BODY)
-      .do(action => appStore.dispatch({
+      .do(action => this.appStore.dispatch({
         type: actions.FETCHING_BODY,
         payload: {
           slug: action.payload.slug
@@ -49,44 +65,35 @@ export class BlogService {
           type: actions.FETCHED_BODY,
           payload: {
             slug: action.payload.slug,
-            body: this.toBodyPayload(json),
+            body: this.mapper.ResponseToBlogBody(json),
           }
         })
       );
 
     Observable
-      .merge(summariesDispatcher, bodyDispatcher)
-      .subscribe((action: Action) => appStore.dispatch(action));
-
-    this.store$ = this.appStore.select(appStore => appStore.blog);
-    this.postMap$ = this.store$
-      .filter(store => !store.needSummaries)
-      .map(store => store.postMap);
+      .merge(fetchSummaries$, fetchBody$)
+      .subscribe((action: Action) => this.appStore.dispatch(action));
   }
 
 
   // public 
   loadSummaries(): void {
     if(this.appStore.value.blog.needSummaries) {
-      this.dispatch$.next({type: actions.FETCH_SUMMARIES});
+      this.actionDispatch$.next({type: actions.FETCH_SUMMARIES});
     }
   }
   
-  getPosts(): Promise<models.IBlogPost[]> {
+  getPosts(): Observable<models.IBlogPost[]> {
     return this.postMap$
-      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]))
-      .take(1)
-      .toPromise();
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]));
   }
 
-  getRecentPosts(): Promise<models.IBlogPost[]> {
+  getRecentPosts(): Observable<models.IBlogPost[]> {
     return this.postMap$
-      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]).slice(0,5))
-      .take(1)
-      .toPromise();
+      .map(postMap => Object.keys(postMap).map(slug => postMap[slug]).slice(0,5));
   }
 
-  getPost(slug: string): Promise<models.IBlogPost> {
+  getPost(slug: string): Observable<models.IBlogPost> {
     let post$ = this.postMap$
       .map(postMap => postMap[slug]);
     
@@ -94,14 +101,14 @@ export class BlogService {
       .filter(post => post.needBody && !post.isUpdating)
       .subscribe(post => this.loadBody(post));
     
-    return post$.filter(post => !post.needBody).take(1).toPromise();
+    return post$.filter(post => !post.needBody);
   }
   
   
   // private helpers
   loadBody(post: models.IBlogPost): void {
     if(post && post.needBody) {
-      this.dispatch$.next({
+      this.actionDispatch$.next({
         type: actions.FETCH_BODY,
         payload: {
           id: post.id,
@@ -124,22 +131,6 @@ export class BlogService {
     });
   }
   
-  private request(options: any): Observable<any> {
-    if (options.body) {
-      if (typeof options.body !== 'string') {
-        options.body = JSON.stringify(options.body);
-      }
-
-      options.headers = new Headers({
-        'Content-Type': 'application/json'
-      });
-    }
-
-    return this.http
-      .request(new Request(options))
-      .map(res => res.json());
-  }
-  
   private getPostsEndpoint(q: string) : string {
     return `${this.API_ROOT}get_posts/?${q}`;
   }
@@ -153,35 +144,4 @@ export class BlogService {
     return this.getPostEndpoint(id, 'include=content');
   }
 
-  
-  private toSummariesPayload(json) {
-    let postMap = json.posts.reduce((accum, item) => {
-      accum[item.slug] = {
-        id: item.id,
-        title: item.title,
-        slug: item.slug,
-        date: new Date(item.date),
-        summary: item.excerpt,
-        needBody: true,
-        isUpdating: false,
-      };
-      return accum;
-    }, {});
-    let postCount = json.count_total;
-    let pageCount = Math.ceil(postCount / 5);
-    
-    return {
-      postCount,
-      pageCount,
-      postMap,
-    } 
-  }
-  private toBodyPayload(json) {
-    let post = json.post;
-    return {
-      id: post.id,
-      body: post.content,
-    }
-  }
-  
 }

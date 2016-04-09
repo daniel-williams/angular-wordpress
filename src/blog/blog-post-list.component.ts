@@ -29,9 +29,8 @@ export class BlogPostListComponent implements OnInit {
   }
   
   ngOnInit() {
-    this.blogService.getPosts().then(
-      posts => this.posts = posts,
-      err => console.log(err)
-    );
+    this.blogService
+      .getPosts()
+      .subscribe(posts => this.posts = posts);
   }
 }

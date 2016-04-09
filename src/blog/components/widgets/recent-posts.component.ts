@@ -17,9 +17,8 @@ export class RecentPostsComponent implements OnInit {
   constructor(private blogService: BlogService) {}
   
   ngOnInit() {
-    this.blogService.getRecentPosts().then(
-      posts => this.posts = posts,
-      err => console.log(err)
-    );
+    this.blogService
+      .getRecentPosts()
+      .subscribe(posts => this.posts = posts);
   }
 }

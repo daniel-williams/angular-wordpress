@@ -36,9 +36,8 @@ export class BlogPostDetailComponent implements OnInit {
   }
   
   ngOnInit() {
-    this.blogService.getPost(this.slug).then(
-      post => this.post = post,
-      err => console.log(err)
-    );
+    this.blogService
+      .getPost(this.slug)
+      .subscribe(post => this.post = post);
   }
 }
