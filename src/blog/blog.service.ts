@@ -30,12 +30,14 @@ export class BlogService extends FetchService {
     
     this.API_ROOT = `http://${blogConfig.url}/api/`;
 
-    this.subscribeToActions();
-    
-    this.blogStore$ = this.appStore.select(appStore => appStore.blog);
+    this.blogStore$ = this.appStore
+      .select(appStore => appStore.blog);
+      
     this.postMap$ = this.blogStore$
       .filter(store => !store.needSummaries)
       .map(store => store.postMap);
+
+    this.subscribeToActions();
   }
   
   private subscribeToActions() {
@@ -131,17 +133,11 @@ export class BlogService extends FetchService {
     });
   }
   
-  private getPostsEndpoint(q: string) : string {
-    return `${this.API_ROOT}get_posts/?${q}`;
-  }
-  private getPostEndpoint(id: number, q: string): string {
-    return `${this.API_ROOT}get_post/?post_id=${id}&${q}`;
-  }
   private getSummariesUrl(): string {
-    return this.getPostsEndpoint('include=id,title,slug,date,excerpt&count=500');
+    return `${this.API_ROOT}get_posts/?include=id,title,slug,date,excerpt&count=500`;
   }
   private getBodyUrl(id: number): string {
-    return this.getPostEndpoint(id, 'include=content');
+    return `${this.API_ROOT}get_post/?post_id=${id}&include=content`;
   }
 
 }
