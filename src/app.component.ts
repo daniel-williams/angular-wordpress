@@ -7,7 +7,7 @@ import {STORE_PROVIDERS} from './store';
 
 import {HomeComponent} from './home';
 import {AboutComponent} from './about';
-import {BlogContainer} from './blog/blog.container';
+import {BlogComponent} from './blog';
 
 
 @Component({
@@ -32,27 +32,12 @@ import {BlogContainer} from './blog/blog.container';
     {
       path: '/blog/...',
       name: 'Blog',
-      component: BlogContainer
+      component: BlogComponent
     },
     {
       path: '/**',
       redirectTo: ['Home']
     },
-    // {
-    //   path: '/blog/tag/:tag',
-    //   name: 'BlogTag',
-    //   component: BlogComponent
-    // },
-    // {
-    //   path: '/blog/:slug',
-    //   name: 'BlogPost',
-    //   component: BlogComponent
-    // },
-    // {
-    //     path: '/blog',
-    //     name: 'Blog',
-    //     component: BlogComponent
-    // }
 ])
 export class AppComponent {
 }

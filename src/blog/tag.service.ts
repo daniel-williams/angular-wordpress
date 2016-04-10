@@ -4,6 +4,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
 import {FetchService} from '../fetch.service';
+import {TagServiceMapper} from './tag.service-mapper.ts';
 import {BLOG_CONFIG, IBlogConfig} from './blog.config';
 import {IAppStore} from '../store';
 import * as models from './models';
@@ -14,20 +15,23 @@ import * as actions from './blog.actions';
 export class TagService extends FetchService {
   
   private API_ROOT: string;
+  private mapper: TagServiceMapper;
+  private appStore: Store<IAppStore>;
   private blogStore$: Observable<models.IBlogStore>;
   private tags$: Observable<models.ITag[]>;
-  
   private actionDispatch$ = new BehaviorSubject<Action>({type: null, payload: null});
   
   constructor(
-    protected http: Http,
-    private appStore: Store<IAppStore>,
-    @Inject(BLOG_CONFIG) private blogConfig: IBlogConfig
+    http: Http,
+    mapper: TagServiceMapper,
+    appStore: Store<IAppStore>,
+    @Inject(BLOG_CONFIG) blogConfig: IBlogConfig
   ) {
     super(http);
     
     this.API_ROOT = `http://${blogConfig.url}/api/`;
-    
+    this.mapper = mapper;
+    this.appStore = appStore;
     this.blogStore$ = appStore.select(appStore => appStore.blog);
     this.tags$ = this.blogStore$
       .filter(blogStore => !blogStore.needTags)
@@ -45,7 +49,7 @@ export class TagService extends FetchService {
         (action, json) => ({
           type: actions.FETCHED_TAGS,
           payload: {
-            tags: this.toTagPayload(json)
+            tags: this.mapper.responseToTag(json)
           }
         })
       );
@@ -76,13 +80,4 @@ export class TagService extends FetchService {
     return `${this.API_ROOT}get_tag_index/`;
   }
   
-  private toTagPayload(json: any): models.ITag[] {
-    return json.tags.map(tag => ({
-      id: tag.id,
-      title: tag.title,
-      slug: tag.slug,
-      description: tag.description,
-      count: tag.post_count,
-    }));
-  }
 }

@@ -5,7 +5,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {Action, Store} from '@ngrx/store';
 
 import {FetchService} from '../fetch.service';
-import {BlogResponseMapper} from './blog.response-mapper';
+import {BlogServiceMapper} from './blog.service-mapper';
 import {BLOG_CONFIG, IBlogConfig} from './blog.config';
 import {IAppStore} from '../store';
 import * as models from './models';
@@ -14,8 +14,10 @@ import * as actions from './blog.actions';
 
 @Injectable()
 export class BlogService extends FetchService {
-  
+  private router: Router
   private API_ROOT: string;
+  private appStore: Store<IAppStore>;
+  private mapper: BlogServiceMapper
   private blogStore$: Observable<models.IBlogStore>;
   private postMap$: Observable<any>;
   
@@ -23,18 +25,21 @@ export class BlogService extends FetchService {
   
   postsPerPage: number;
   pageCount: number;
-  currentPage: number = 1;
+  currentPage: number;
   
   constructor(
-    protected http: Http,
-    private router: Router,
-    private appStore: Store<IAppStore>,
-    private mapper: BlogResponseMapper,
-    @Inject(BLOG_CONFIG) private blogConfig: IBlogConfig
+    http: Http,
+    router: Router,
+    appStore: Store<IAppStore>,
+    mapper: BlogServiceMapper,
+    @Inject(BLOG_CONFIG) blogConfig: IBlogConfig
   ) {
     super(http);
     
     this.API_ROOT = `http://${blogConfig.url}/api/`;
+    this.router = router;
+    this.appStore = appStore;
+    this.mapper = mapper;
 
     this.blogStore$ = this.appStore
       .select(appStore => appStore.blog);
@@ -43,6 +48,7 @@ export class BlogService extends FetchService {
       .subscribe(store => {
         this.postsPerPage = store.postsPerPage;
         this.pageCount = store.pageCount;
+        this.currentPage = store.currentPage;
       });
 
     this.postMap$ = this.blogStore$
@@ -131,7 +137,11 @@ export class BlogService extends FetchService {
     
     return post$.filter(post => !post.needBody);
   }
-  
+
+  // paging
+  // setCurrentPage(page: number) {
+  //   this.currentPage = page;
+  // }
   isFirstPage(): boolean {
     return this.currentPage === 1;
   }
@@ -143,23 +153,26 @@ export class BlogService extends FetchService {
   isLastPage(): boolean {
     return this.currentPage === this.pageCount || this.pageCount === 0;
   }
-  
   onNext(event) {
     if(this.currentPage < this.pageCount) {
-      this.router.navigate(['BlogPostList', {page: this.currentPage + 1}]);
+      let nextPage = this.currentPage + 1;
+      this.appStore.dispatch({type: actions.BLOG_PAGE_NEXT});
+      this.router.navigate(['BlogPostList', {page: nextPage}]);
     }
   }
   onPrevious(event) {
-    if(this.currentPage > 2) {
-      this.router.navigate(['BlogPostList', {page: this.currentPage - 1}]);
-    } else if(this.currentPage === 2) {
-      this.router.navigate(['BlogPostList']);
+    if(this.currentPage > 1) {
+      let nextPage = this.currentPage - 1;
+      this.appStore.dispatch({type: actions.BLOG_PAGE_PREV});
+      if(nextPage === 1) {
+        this.router.navigate(['BlogPostList']);
+      } else {
+        this.router.navigate(['BlogPostList', {page: nextPage}]);
+      }
     }
   }
   
-  setCurrentPage(page: number) {
-    this.currentPage = page;
-  }
+  
   
   // private helpers
   private fetchSummaries(): Observable<models.IBlogSummary[]> {

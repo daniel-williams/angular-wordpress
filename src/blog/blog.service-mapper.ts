@@ -5,7 +5,7 @@ import * as models from './models';
 
 
 @Injectable()
-export class BlogResponseMapper {
+export class BlogServiceMapper {
   
   private postsPerPage;
   

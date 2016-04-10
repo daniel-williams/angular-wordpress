@@ -13,9 +13,12 @@ import {ITag} from '../../models';
   directives: [ROUTER_DIRECTIVES],
 })
 export class TagCloudComponent implements OnInit {
+  private tagService: TagService;
   private tagMeta: Array<any>;
   
-  constructor(private tagService: TagService) {}
+  constructor(tagService: TagService) {
+    this.tagService = tagService;
+  }
 
   ngOnInit() {
     this.tagService.getTags()

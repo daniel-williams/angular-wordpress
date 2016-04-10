@@ -14,10 +14,14 @@ import {FetchingComponent} from '../../shared/components/fetching/fetching.compo
   styles: [require('./blog-post-detail.component.scss')],
 })
 export class BlogPostDetailComponent {
-  slug: string;
-  post: IBlogPost = null;
+  private location: Location;
+  private blogService: BlogService;
+  private slug: string;
+  private post: IBlogPost = null;
   
-  constructor(private location: Location, private routeParams: RouteParams, private blogService: BlogService) {
+  constructor(location: Location, routeParams: RouteParams, blogService: BlogService) {
+    this.location = location;
+    this.blogService = blogService;
     this.slug = routeParams.get('slug');
   }
   

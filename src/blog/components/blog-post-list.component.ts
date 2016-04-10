@@ -14,10 +14,11 @@ import {PagerComponent} from '../../shared/components/pager/pager.component';
   styles: [require('./Blog-post-list.component.scss')],
 })
 export class BlogPostListComponent {
-  posts: IBlogPost[] = [];
+  private blogService: BlogService;
+  private posts: IBlogPost[] = [];
   
-  constructor(private routeParams: RouteParams, private blogService: BlogService) {
-    blogService.setCurrentPage(+(this.routeParams.get('page') || 1));
+  constructor(blogService: BlogService) {
+    this.blogService = blogService;
   }
   
   ngOnInit() {

@@ -12,9 +12,12 @@ import {IBlogPost} from '../../models';
   directives: [ROUTER_DIRECTIVES],
 })
 export class RecentPostsComponent implements OnInit {
-  posts: IBlogPost[];
+  private blogService: BlogService
+  private posts: IBlogPost[];
   
-  constructor(private blogService: BlogService) {}
+  constructor(blogService: BlogService) {
+    this.blogService = blogService;
+  }
   
   ngOnInit() {
     this.blogService
